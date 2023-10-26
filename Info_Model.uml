@@ -1,135 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_-1KFcHGREe6CaP7cgoCzhA" name="Model">
-  <eAnnotations xmi:id="_-1KFcXGREe6CaP7cgoCzhA" source="Objing">
-    <contents xmi:type="uml:Property" xmi:id="_-1KFcnGREe6CaP7cgoCzhA" name="exporterVersion">
-      <defaultValue xmi:type="uml:LiteralString" xmi:id="_-1KFc3GREe6CaP7cgoCzhA" value="3.0.0"/>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_vxiR4HPZEe6XLrFCMTbbzA" name="Model">
+  <eAnnotations xmi:id="_vxsC4HPZEe6XLrFCMTbbzA" source="Objing">
+    <contents xmi:type="uml:Property" xmi:id="_vxsC4XPZEe6XLrFCMTbbzA" name="exporterVersion">
+      <defaultValue xmi:type="uml:LiteralString" xmi:id="_vxsC4nPZEe6XLrFCMTbbzA" value="3.0.0"/>
     </contents>
   </eAnnotations>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFdHGREe6CaP7cgoCzhA" name="Wagon">
-    <generalization xmi:id="_-1KFdXGREe6CaP7cgoCzhA" general="_-1KFdnGREe6CaP7cgoCzhA"/>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFdnGREe6CaP7cgoCzhA" name="RollingStock">
-    <ownedComment xmi:id="_-1KFd3GREe6CaP7cgoCzhA">
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsC43PZEe6XLrFCMTbbzA" name="RollingStock">
+    <ownedComment xmi:id="_vxsC5HPZEe6XLrFCMTbbzA">
       <body>&lt;Enter note text here></body>
     </ownedComment>
+    <generalization xmi:id="_vxsC5XPZEe6XLrFCMTbbzA" general="_vxsDIXPZEe6XLrFCMTbbzA"/>
   </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFeHGREe6CaP7cgoCzhA" name="Locomotive">
-    <generalization xmi:id="_-1KFeXGREe6CaP7cgoCzhA" general="_-1KFdnGREe6CaP7cgoCzhA"/>
-    <ownedAttribute xmi:id="_-1KFenGREe6CaP7cgoCzhA" name="carriage" visibility="public" type="_-1KFf3GREe6CaP7cgoCzhA" isUnique="false" association="_-1KFfHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFe3GREe6CaP7cgoCzhA"/>
-    </ownedAttribute>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsC5nPZEe6XLrFCMTbbzA" name="Locomotive">
+    <generalization xmi:id="_vxsC53PZEe6XLrFCMTbbzA" general="_vxsDIXPZEe6XLrFCMTbbzA"/>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFfHGREe6CaP7cgoCzhA" memberEnd="_-1KFenGREe6CaP7cgoCzhA _-1KFfXGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFfXGREe6CaP7cgoCzhA" visibility="public" type="_-1KFeHGREe6CaP7cgoCzhA" isUnique="false" association="_-1KFfHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFfnGREe6CaP7cgoCzhA"/>
-    </ownedEnd>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFf3GREe6CaP7cgoCzhA" name="Carriage">
-    <generalization xmi:id="_-1KFgHGREe6CaP7cgoCzhA" general="_-1KFdnGREe6CaP7cgoCzhA"/>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFgXGREe6CaP7cgoCzhA" name="ScenicItem">
-    <ownedComment xmi:id="_-1KFgnGREe6CaP7cgoCzhA">
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsC6HPZEe6XLrFCMTbbzA" name="ScenicItem">
+    <ownedComment xmi:id="_vxsC6XPZEe6XLrFCMTbbzA">
       <body>&lt;Enter note text here></body>
     </ownedComment>
+    <generalization xmi:id="_vxsC6nPZEe6XLrFCMTbbzA" general="_vxsDIXPZEe6XLrFCMTbbzA"/>
   </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFg3GREe6CaP7cgoCzhA" name="TrackPiece"/>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFhHGREe6CaP7cgoCzhA" name="TrainSet">
-    <ownedAttribute xmi:id="_-1KFhXGREe6CaP7cgoCzhA" name="rollingStock" visibility="public" type="_-1KFdnGREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFiXGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFhnGREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsC63PZEe6XLrFCMTbbzA" name="TrackPiece">
+    <generalization xmi:id="_vxsC7HPZEe6XLrFCMTbbzA" general="_vxsDIXPZEe6XLrFCMTbbzA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsC7XPZEe6XLrFCMTbbzA" name="TrainSet">
+    <generalization xmi:id="_vxsC7nPZEe6XLrFCMTbbzA" general="_vxsDIXPZEe6XLrFCMTbbzA"/>
+    <ownedAttribute xmi:id="_vxsC73PZEe6XLrFCMTbbzA" name="trackPack" visibility="public" type="_vxsDA3PZEe6XLrFCMTbbzA" isUnique="false" aggregation="shared" association="_vxsC93PZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsC8HPZEe6XLrFCMTbbzA"/>
     </ownedAttribute>
-    <ownedAttribute xmi:id="_-1KFh3GREe6CaP7cgoCzhA" name="trackPiece" visibility="public" type="_-1KFg3GREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFjHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFiHGREe6CaP7cgoCzhA"/>
+    <ownedAttribute xmi:id="_vxsC8XPZEe6XLrFCMTbbzA" name="rollingStock" visibility="public" type="_vxsC43PZEe6XLrFCMTbbzA" isUnique="false" aggregation="shared" association="_vxsC-nPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsC8nPZEe6XLrFCMTbbzA"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_vxsC83PZEe6XLrFCMTbbzA" name="controller" visibility="public" type="_vxsDInPZEe6XLrFCMTbbzA" isUnique="false" aggregation="shared" association="_vxsC_XPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsC9HPZEe6XLrFCMTbbzA"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_vxsC9XPZEe6XLrFCMTbbzA" name="locomotive" visibility="public" type="_vxsC5nPZEe6XLrFCMTbbzA" isUnique="false" aggregation="shared" association="_vxsDAHPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsC9nPZEe6XLrFCMTbbzA"/>
     </ownedAttribute>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFiXGREe6CaP7cgoCzhA" memberEnd="_-1KFhXGREe6CaP7cgoCzhA _-1KFinGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFinGREe6CaP7cgoCzhA" visibility="public" type="_-1KFhHGREe6CaP7cgoCzhA" isUnique="false" association="_-1KFiXGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFi3GREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsC93PZEe6XLrFCMTbbzA" memberEnd="_vxsC73PZEe6XLrFCMTbbzA _vxsC-HPZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsC-HPZEe6XLrFCMTbbzA" visibility="public" type="_vxsC7XPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsC93PZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsC-XPZEe6XLrFCMTbbzA"/>
     </ownedEnd>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFjHGREe6CaP7cgoCzhA" memberEnd="_-1KFh3GREe6CaP7cgoCzhA _-1KFjXGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFjXGREe6CaP7cgoCzhA" visibility="public" type="_-1KFhHGREe6CaP7cgoCzhA" isUnique="false" association="_-1KFjHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFjnGREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsC-nPZEe6XLrFCMTbbzA" memberEnd="_vxsC8XPZEe6XLrFCMTbbzA _vxsC-3PZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsC-3PZEe6XLrFCMTbbzA" visibility="public" type="_vxsC7XPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsC-nPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsC_HPZEe6XLrFCMTbbzA"/>
     </ownedEnd>
   </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFj3GREe6CaP7cgoCzhA" name="TrackPack">
-    <ownedAttribute xmi:id="_-1KFkHGREe6CaP7cgoCzhA" name="trackPiece" visibility="public" type="_-1KFg3GREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFknGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFkXGREe6CaP7cgoCzhA"/>
-    </ownedAttribute>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFknGREe6CaP7cgoCzhA" memberEnd="_-1KFkHGREe6CaP7cgoCzhA _-1KFk3GREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFk3GREe6CaP7cgoCzhA" visibility="public" type="_-1KFj3GREe6CaP7cgoCzhA" isUnique="false" association="_-1KFknGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFlHGREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsC_XPZEe6XLrFCMTbbzA" memberEnd="_vxsC83PZEe6XLrFCMTbbzA _vxsC_nPZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsC_nPZEe6XLrFCMTbbzA" visibility="public" type="_vxsC7XPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsC_XPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsC_3PZEe6XLrFCMTbbzA"/>
     </ownedEnd>
   </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFlXGREe6CaP7cgoCzhA" name="TrainPack">
-    <ownedAttribute xmi:id="_-1KFlnGREe6CaP7cgoCzhA" name="carriage" visibility="public" type="_-1KFf3GREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFmHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFl3GREe6CaP7cgoCzhA"/>
-    </ownedAttribute>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFmHGREe6CaP7cgoCzhA" memberEnd="_-1KFlnGREe6CaP7cgoCzhA _-1KFmXGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFmXGREe6CaP7cgoCzhA" visibility="public" type="_-1KFlXGREe6CaP7cgoCzhA" isUnique="false" association="_-1KFmHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFmnGREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsDAHPZEe6XLrFCMTbbzA" memberEnd="_vxsC9XPZEe6XLrFCMTbbzA _vxsDAXPZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsDAXPZEe6XLrFCMTbbzA" visibility="public" type="_vxsC7XPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsDAHPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDAnPZEe6XLrFCMTbbzA"/>
     </ownedEnd>
   </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFm3GREe6CaP7cgoCzhA" name="StaffAccount">
-    <generalization xmi:id="_-1KFnHGREe6CaP7cgoCzhA" general="_-1KFoXGREe6CaP7cgoCzhA"/>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFnXGREe6CaP7cgoCzhA" name="ManagerAccount">
-    <generalization xmi:id="_-1KFnnGREe6CaP7cgoCzhA" general="_-1KFoXGREe6CaP7cgoCzhA"/>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFn3GREe6CaP7cgoCzhA" name="CustomerAccount">
-    <generalization xmi:id="_-1KFoHGREe6CaP7cgoCzhA" general="_-1KFoXGREe6CaP7cgoCzhA"/>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFoXGREe6CaP7cgoCzhA" name="Account">
-    <ownedAttribute xmi:id="_-1KFonGREe6CaP7cgoCzhA" name="order" visibility="public" type="_-1KFvHGREe6CaP7cgoCzhA" isUnique="false" association="_-1KFpHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFo3GREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDA3PZEe6XLrFCMTbbzA" name="TrackPack">
+    <generalization xmi:id="_vxsDBHPZEe6XLrFCMTbbzA" general="_vxsDIXPZEe6XLrFCMTbbzA"/>
+    <ownedAttribute xmi:id="_vxsDBXPZEe6XLrFCMTbbzA" name="trackPiece" visibility="public" type="_vxsC63PZEe6XLrFCMTbbzA" isUnique="false" aggregation="shared" association="_vxsDB3PZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDBnPZEe6XLrFCMTbbzA"/>
     </ownedAttribute>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFpHGREe6CaP7cgoCzhA" memberEnd="_-1KFonGREe6CaP7cgoCzhA _-1KFpXGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFpXGREe6CaP7cgoCzhA" visibility="public" type="_-1KFoXGREe6CaP7cgoCzhA" isUnique="false" association="_-1KFpHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFpnGREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsDB3PZEe6XLrFCMTbbzA" memberEnd="_vxsDBXPZEe6XLrFCMTbbzA _vxsDCHPZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsDCHPZEe6XLrFCMTbbzA" visibility="public" type="_vxsDA3PZEe6XLrFCMTbbzA" isUnique="false" association="_vxsDB3PZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDCXPZEe6XLrFCMTbbzA"/>
     </ownedEnd>
   </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFp3GREe6CaP7cgoCzhA" name="OrderLine">
-    <ownedAttribute xmi:id="_-1KFqHGREe6CaP7cgoCzhA" name="trainSet" visibility="public" type="_-1KFhHGREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFsHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFqXGREe6CaP7cgoCzhA"/>
-    </ownedAttribute>
-    <ownedAttribute xmi:id="_-1KFqnGREe6CaP7cgoCzhA" name="trainPack" visibility="public" type="_-1KFlXGREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFs3GREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFq3GREe6CaP7cgoCzhA"/>
-    </ownedAttribute>
-    <ownedAttribute xmi:id="_-1KFrHGREe6CaP7cgoCzhA" name="trackPack" visibility="public" type="_-1KFj3GREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFtnGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFrXGREe6CaP7cgoCzhA"/>
-    </ownedAttribute>
-    <ownedAttribute xmi:id="_-1KFrnGREe6CaP7cgoCzhA" name="scenicItem" visibility="public" type="_-1KFgXGREe6CaP7cgoCzhA" isUnique="false" aggregation="shared" association="_-1KFuXGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFr3GREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDCnPZEe6XLrFCMTbbzA" name="StaffAccount">
+    <generalization xmi:id="_vxsDC3PZEe6XLrFCMTbbzA" general="_vxsDEHPZEe6XLrFCMTbbzA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDDHPZEe6XLrFCMTbbzA" name="ManagerAccount">
+    <generalization xmi:id="_vxsDDXPZEe6XLrFCMTbbzA" general="_vxsDEHPZEe6XLrFCMTbbzA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDDnPZEe6XLrFCMTbbzA" name="CustomerAccount">
+    <generalization xmi:id="_vxsDD3PZEe6XLrFCMTbbzA" general="_vxsDEHPZEe6XLrFCMTbbzA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDEHPZEe6XLrFCMTbbzA" name="Account">
+    <ownedAttribute xmi:id="_vxsDEXPZEe6XLrFCMTbbzA" name="order" visibility="public" type="_vxsDHHPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsDE3PZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDEnPZEe6XLrFCMTbbzA"/>
     </ownedAttribute>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFsHGREe6CaP7cgoCzhA" memberEnd="_-1KFqHGREe6CaP7cgoCzhA _-1KFsXGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFsXGREe6CaP7cgoCzhA" visibility="public" type="_-1KFp3GREe6CaP7cgoCzhA" isUnique="false" association="_-1KFsHGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFsnGREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsDE3PZEe6XLrFCMTbbzA" memberEnd="_vxsDEXPZEe6XLrFCMTbbzA _vxsDFHPZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsDFHPZEe6XLrFCMTbbzA" visibility="public" type="_vxsDEHPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsDE3PZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDFXPZEe6XLrFCMTbbzA"/>
     </ownedEnd>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFs3GREe6CaP7cgoCzhA" memberEnd="_-1KFqnGREe6CaP7cgoCzhA _-1KFtHGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFtHGREe6CaP7cgoCzhA" visibility="public" type="_-1KFp3GREe6CaP7cgoCzhA" isUnique="false" association="_-1KFs3GREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFtXGREe6CaP7cgoCzhA"/>
-    </ownedEnd>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFtnGREe6CaP7cgoCzhA" memberEnd="_-1KFrHGREe6CaP7cgoCzhA _-1KFt3GREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFt3GREe6CaP7cgoCzhA" visibility="public" type="_-1KFp3GREe6CaP7cgoCzhA" isUnique="false" association="_-1KFtnGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFuHGREe6CaP7cgoCzhA"/>
-    </ownedEnd>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFuXGREe6CaP7cgoCzhA" memberEnd="_-1KFrnGREe6CaP7cgoCzhA _-1KFunGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFunGREe6CaP7cgoCzhA" visibility="public" type="_-1KFp3GREe6CaP7cgoCzhA" isUnique="false" association="_-1KFuXGREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFu3GREe6CaP7cgoCzhA"/>
-    </ownedEnd>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Class" xmi:id="_-1KFvHGREe6CaP7cgoCzhA" name="Order">
-    <ownedAttribute xmi:id="_-1KFvXGREe6CaP7cgoCzhA" name="orderLine" visibility="public" type="_-1KFp3GREe6CaP7cgoCzhA" isUnique="false" aggregation="composite" association="_-1KFv3GREe6CaP7cgoCzhA">
-      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-1KFvnGREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDFnPZEe6XLrFCMTbbzA" name="OrderLine">
+    <ownedAttribute xmi:id="_vxsDF3PZEe6XLrFCMTbbzA" name="product" visibility="public" type="_vxsDIXPZEe6XLrFCMTbbzA" isUnique="false" aggregation="shared" association="_vxsDGXPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDGHPZEe6XLrFCMTbbzA"/>
     </ownedAttribute>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_-1KFv3GREe6CaP7cgoCzhA" memberEnd="_-1KFvXGREe6CaP7cgoCzhA _-1KFwHGREe6CaP7cgoCzhA">
-    <ownedEnd xmi:id="_-1KFwHGREe6CaP7cgoCzhA" visibility="public" type="_-1KFvHGREe6CaP7cgoCzhA" isUnique="false" association="_-1KFv3GREe6CaP7cgoCzhA"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsDGXPZEe6XLrFCMTbbzA" memberEnd="_vxsDF3PZEe6XLrFCMTbbzA _vxsDGnPZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsDGnPZEe6XLrFCMTbbzA" visibility="public" type="_vxsDFnPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsDGXPZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDG3PZEe6XLrFCMTbbzA"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDHHPZEe6XLrFCMTbbzA" name="Order">
+    <ownedAttribute xmi:id="_vxsDHXPZEe6XLrFCMTbbzA" name="orderLine" visibility="public" type="_vxsDFnPZEe6XLrFCMTbbzA" isUnique="false" aggregation="composite" association="_vxsDH3PZEe6XLrFCMTbbzA">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vxsDHnPZEe6XLrFCMTbbzA"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vxsDH3PZEe6XLrFCMTbbzA" memberEnd="_vxsDHXPZEe6XLrFCMTbbzA _vxsDIHPZEe6XLrFCMTbbzA">
+    <ownedEnd xmi:id="_vxsDIHPZEe6XLrFCMTbbzA" visibility="public" type="_vxsDHHPZEe6XLrFCMTbbzA" isUnique="false" association="_vxsDH3PZEe6XLrFCMTbbzA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDIXPZEe6XLrFCMTbbzA" name="Product"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vxsDInPZEe6XLrFCMTbbzA" name="Controller">
+    <generalization xmi:id="_vxsDI3PZEe6XLrFCMTbbzA" general="_vxsDIXPZEe6XLrFCMTbbzA"/>
   </packagedElement>
 </uml:Model>
