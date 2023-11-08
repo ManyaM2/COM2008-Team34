@@ -9,6 +9,7 @@ public class Product {
     public String getBrandName() { return brandName; }
     public String getGauge() { return gauge; }
     public String getProductName() { return productName; }
+    public String getProductCode() { return productCode; }
     public double getRetailPrice() { return retailPrice; }
     public int getStockLevel() { return stockLevel; }
     public String getScale(){
