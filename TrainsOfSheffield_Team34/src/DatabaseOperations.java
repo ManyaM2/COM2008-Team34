@@ -36,6 +36,8 @@ public class DatabaseOperations {
 
                 address = new Address(houseNumber, roadName, cityName, postcode);
             }
+            resultSet.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,37 +68,47 @@ public class DatabaseOperations {
                 String roleName = resultSet.getString(2);
                 roles.add(roleName);
             }
+            resultSet.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return roles;
     }
-    /* TODO - Need to edit other classes to get working: discussion required
+
+    /**
+     * Get the userID, forename, surname and email of all the users in the database
+     * @param connection
+     * @return A list of users (List<User>)
+     * @throws SQLException
+     */
     public List<User> getUsers(Connection connection) throws SQLException {
         List<User> users = new ArrayList<>();
         ResultSet resultSet = null;
         try {
-            //Get all the roles from the database
-            String sqlQuery = "SELECT u.userID, u.forename, u.surname, u.email " +
-                    "FROM Users u";
+            //Get all the users in the database
+            String sqlQuery = "SELECT userID, forename, surname, email " +
+                    "FROM Users";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
-            // Find the roles with the corresponding userID
+            // Add the users to the list of users
             while (resultSet.next()) {
                 int userID = resultSet.getInt(1);
                 String forename = resultSet.getString(2);
                 String surname = resultSet.getString(3);
                 String email = resultSet.getString(4);
+                List<String> roles = getRole(connection, userID);
 
-                users.add(new )
+                users.add(new User(forename, surname, userID, email, roles));
             }
             resultSet.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return roles;
-    }*/
+        return users;
+    }
 
     /**
      * @param connection
@@ -122,6 +134,8 @@ public class DatabaseOperations {
                 List<OrderLine> orderlines = getOrderline(connection, orderNumber);
                 orders.add(new Order(orderNumber, userID, orderStatus, orderlines));
             }
+            resultSet.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -154,9 +168,29 @@ public class DatabaseOperations {
 
                 orderlines.add(new OrderLine(productQuantity,lineNumber,productCode));
             }
+            resultSet.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return orderlines;
+    }
+
+    public void updateBankDetails(Connection connection, BankDetails details) throws SQLException {
+        try {
+            String sqlQuery = "UPDATE BankDetails" +
+                    "SET cardName = ?, cardNumber = ?, holderName = ?, securityCode = ? " +
+                    "WHERE bankDetailsID = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setString(1, details.getCardName());
+            statement.setInt(2, details.getCardNumber());
+            statement.setString(3, details.getHolderName());
+            statement.setString(4, details.getSecurityCode());
+            statement.setInt(5, details.getBankDetailsID());
+            statement.executeUpdate(sqlQuery);
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

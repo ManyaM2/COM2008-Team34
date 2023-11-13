@@ -5,6 +5,7 @@ public class BankDetails {
     private String expiryDate;
     private String holderName;
     private String securityCode;
+    private int bankDetailsID;
 
     public String getCardName() {
         return cardName;
@@ -26,11 +27,14 @@ public class BankDetails {
         return securityCode;
     }
 
-    public BankDetails (String cName, Integer cNumber, String date, String hName, String code) {
+    public int getBankDetailsID(){ return bankDetailsID; }
+
+    public BankDetails (String cName, Integer cNumber, String date, String hName, String code, int id) {
         this.cardName = cName;
         this.cardNumber = cNumber;
         this.expiryDate = date;
         this.holderName = hName;
         this.securityCode = code;
+        this.bankDetailsID = id;
     }
 }
