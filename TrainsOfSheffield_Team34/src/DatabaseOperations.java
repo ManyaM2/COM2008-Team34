@@ -17,26 +17,25 @@ public class DatabaseOperations {
         Address address = null;
         ResultSet resultSet = null;
         try {
-            // Get all the addresses from the database
+            // Get the user's address from the database
             String sqlQuery = "SELECT u.userID, a.houseNumber, a.postcode, a.roadName, a.cityName " +
                     "FROM Users u, Addresses a " +
                     "WHERE u.houseNumber = a.houseNumber " +
-                    "AND u.postCode = a.postcode";
+                    "AND u.postCode = a.postcode " +
+                    "AND u.userID = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, id);
             resultSet = statement.executeQuery(sqlQuery);
 
-            // Find the address with the corresponding userID
-            while (resultSet.next()) {
-                int userID = resultSet.getInt(1);
+            // Save the query results as an address
+            if (resultSet.next()) {
                 int houseNumber = resultSet.getInt(2);
                 String postcode = resultSet.getString(3);
                 String roadName = resultSet.getString(4);
                 String cityName = resultSet.getString(5);
 
-                if (userID == id)
-                    address = new Address(houseNumber, roadName, cityName, postcode);
+                address = new Address(houseNumber, roadName, cityName, postcode);
             }
-            resultSet.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,22 +52,20 @@ public class DatabaseOperations {
         List<String> roles = new ArrayList<>();
         ResultSet resultSet = null;
         try {
-            //Get all the roles from the database
-            String sqlQuery = "SELECT u.userID, r.roleID, r.roleName " +
+            //Get the user's roles from the database
+            String sqlQuery = "SELECT u.userID, r.roleName " +
                     "FROM Users u, Roles r " +
-                    "WHERE u.roleID = r.roleID";
+                    "WHERE u.roleID = r.roleID " +
+                    "AND u.userID = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, id);
             resultSet = statement.executeQuery(sqlQuery);
 
-            // Find the roles with the corresponding userID
+            // Add them to the list of strings
             while (resultSet.next()) {
-                int userID = resultSet.getInt(1);
-                String roleName = resultSet.getString(3);
-
-                if (userID == id)
-                    roles.add(roleName);
+                String roleName = resultSet.getString(2);
+                roles.add(roleName);
             }
-            resultSet.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,7 +122,6 @@ public class DatabaseOperations {
                 List<OrderLine> orderlines = getOrderline(connection, orderNumber);
                 orders.add(new Order(orderNumber, userID, orderStatus, orderlines));
             }
-            resultSet.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,23 +138,22 @@ public class DatabaseOperations {
         List<OrderLine> orderlines = new ArrayList<>();
         ResultSet resultSet = null;
         try {
-            //Get all the orderlines from the database
+            //Get the orderlines associated with the order
             String sqlQuery = "SELECT o.lineNumber, o.orderNumber, o.productCode, o.productQuantity, o.lineCost" +
-                    "FROM OrderLine o";
+                    "FROM OrderLine o " +
+                    "WHERE o.orderNumber = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, orderNum);
             resultSet = statement.executeQuery(sqlQuery);
 
-            // Find the orderlines with the corresponding orderNumber
+            // Add the orderlines to the list of orderlines
             while (resultSet.next()) {
                 int lineNumber = resultSet.getInt(1);
-                int orderNumber = resultSet.getInt(2);
                 String productCode = resultSet.getString(3);
                 int productQuantity = resultSet.getInt(4);
 
-                if (orderNumber == orderNum)
-                    orderlines.add(new OrderLine(productQuantity,lineNumber,productCode));
+                orderlines.add(new OrderLine(productQuantity,lineNumber,productCode));
             }
-            resultSet.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
