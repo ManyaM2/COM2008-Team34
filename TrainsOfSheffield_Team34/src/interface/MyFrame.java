@@ -35,7 +35,6 @@ public class MyFrame extends JFrame {
         panel.add(new JLabel("Password:"));
         panel.add(passwordField);
         panel.add(loginButton);
-        panel.add(cancelButton);
 
         add(panel);
 
