@@ -184,7 +184,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT p.productCode, p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel" +
-                    "FROM PRODUCTS p";
+                    "FROM Products p";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
@@ -212,8 +212,10 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
-            String sqlQuery = "SELECT s.setID,s.productCode, s.eraCode, s.partOfSetCode, s.controllerType" +
-                    "FROM SETS s";
+            String sqlQuery = "SELECT s.setID,s.productCode, s.eraCode, s.partOfSetCode, s.controllerType, " +
+                    "p.productCode, p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel" +
+                    "FROM Sets s, Products p " +
+                    "WHERE p.productCode = s.productCode";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
@@ -240,7 +242,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT c.controllerID,c.productCode, c.typeName, c.partOfSetCode" +
-                    "FROM CONTROLLER c";
+                    "FROM Controller c";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
@@ -265,7 +267,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT l.locomotiveID,l.productCode, l.dccCode, l.eraCode, l.partOfSetCode" +
-                    "FROM LOCOMOTIVES l";
+                    "FROM Locomotives l";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
@@ -291,7 +293,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT rs.rollingStockID,rs.productCode, rs.eraCode, rs.partOfSetCode" +
-                    "FROM ROLLINGSTOCK rs";
+                    "FROM RollingStock rs";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
