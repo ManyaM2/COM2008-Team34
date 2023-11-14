@@ -5,7 +5,7 @@ public class Set extends Product{
 
     public List<Product> getProductCodes(){ return productCodes; }
     public Set(String bName, String gauge, String pName, double rPrice, int sLevel, List<Product> products) {
-        super(bName, gauge, pName, rPrice, sLevel);
+        super(bName, gauge, pName, rPrice, gauge, sLevel);
         this.productCodes = products;
     }
 

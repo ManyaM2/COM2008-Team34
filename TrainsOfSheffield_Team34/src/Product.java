@@ -23,7 +23,7 @@ public class Product {
         return scale;
     }
 
-    public Product(String bName, String gauge, String pName, double rPrice, int sLevel){
+    public Product(String bName, String gauge, String pName, double rPrice, String s, int sLevel){
         this.brandName = bName;
         this.gauge = gauge;
         this.productName = pName;
