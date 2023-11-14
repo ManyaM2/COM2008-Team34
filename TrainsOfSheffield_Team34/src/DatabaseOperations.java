@@ -206,7 +206,7 @@ public class DatabaseOperations {
         }
         return products;
     }
-
+/*
     public List<Set> getSets(Connection connection) throws SQLException {
         List<Set> sets = new ArrayList<>();
         ResultSet resultSet = null;
@@ -221,10 +221,17 @@ public class DatabaseOperations {
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
+                String productCode = resultSet.getString(1);
+                String brandName  = resultSet.getString(2);
+                String productName  = resultSet.getString(3);
+                double retailPrice = resultSet.getDouble(4);
+                String gauge  = resultSet.getString(5);
+                int stockLevel = resultSet.getInt(6);
                 int setID = resultSet.getInt(1);
                 String eraCode  = resultSet.getString(3);
                 String partOfSetCode = resultSet.getString(4);
                 String controllerType = resultSet.getString(5);
+
 
                 sets.add(new Set(setID, eraCode, partOfSetCode, controllerType));
             }
@@ -310,7 +317,7 @@ public class DatabaseOperations {
             e.printStackTrace();
         }
         return rollingStocks;
-    }
+    }*/
 
 
     public void updateBankDetails(Connection connection, BankDetails details) throws SQLException {
