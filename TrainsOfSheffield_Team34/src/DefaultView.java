@@ -1,16 +1,12 @@
 import javax.swing.*;
-import java.sql.SQLException;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DefaultView extends JFrame {
     private JMenuBar menu;
-    private JButton staffArea;
-    private JTextArea product;
-
+    private JButton staffButton;
+    private JTextArea productDisplay;
 
     public DefaultView(Connection connection) throws SQLException {
         this.setTitle("Trains of Sheffield | Home");
@@ -18,66 +14,74 @@ public class DefaultView extends JFrame {
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
-        this.setSize(screenSize.width/2, screenSize.height/2);
-        setLocation(screenSize.width/4, screenSize.height/4);
+        this.setSize(screenSize.width / 2, screenSize.height / 2);
+        setLocation(screenSize.width / 4, screenSize.height / 4);
 
-        JPanel panel = new JPanel();
+        // Make menu bar
+        JMenu homeMenu = new JMenu("Home");
+        JMenu productsMenu = new JMenu("Products");
+        JMenuItem locomotivesItem = new JMenuItem("Locomotives");
+        JMenuItem trackPacksItem = new JMenuItem("Track Packs");
+        JMenuItem trainSetsItem = new JMenuItem("Train Sets");
+        JMenuItem controllersItem = new JMenuItem("Controllers");
+        JMenuItem trackPiecesItem = new JMenuItem("Track Pieces");
+        JMenuItem rollingStockItem = new JMenuItem("Rolling Stock");
 
-        JMenu homeMenu = new JMenu ("Home");
-        JMenu productsMenu = new JMenu ("Products");
-        JMenuItem locomotivesItem = new JMenuItem ("Locomotives");
-        productsMenu.add (locomotivesItem);
-        JMenuItem track_packsItem = new JMenuItem ("Track Packs");
-        productsMenu.add (track_packsItem);
-        JMenuItem train_setsItem = new JMenuItem ("Train Sets");
-        productsMenu.add (train_setsItem);
-        JMenuItem controllersItem = new JMenuItem ("Controllers");
-        productsMenu.add (controllersItem);
-        JMenuItem track_piecesItem = new JMenuItem ("Track Pieces");
-        productsMenu.add (track_piecesItem);
-        JMenuItem rolling_stockItem = new JMenuItem ("Rolling Stock");
-        productsMenu.add (rolling_stockItem);
-        JMenu profileMenu = new JMenu ("Profile");
-        JMenuItem edit_detailsItem = new JMenuItem ("Edit Details");
-        profileMenu.add (edit_detailsItem);
-        JMenuItem my_ordersItem = new JMenuItem ("My Orders");
-        profileMenu.add (my_ordersItem);
+        productsMenu.add(locomotivesItem);
+        productsMenu.add(trackPacksItem);
+        productsMenu.add(trainSetsItem);
+        productsMenu.add(controllersItem);
+        productsMenu.add(trackPiecesItem);
+        productsMenu.add(rollingStockItem);
 
-        //construct components
+        JMenu profileMenu = new JMenu("Profile");
+        JMenuItem editDetailsItem = new JMenuItem("Edit Details");
+        JMenuItem myOrdersItem = new JMenuItem("My Orders");
+
+        profileMenu.add(editDetailsItem);
+        profileMenu.add(myOrdersItem);
+
         menu = new JMenuBar();
-        menu.add (homeMenu);
-        menu.add (productsMenu);
-        menu.add (profileMenu);
-        staffArea = new JButton ("Staff");
+        menu.add(homeMenu);
+        menu.add(productsMenu);
+        menu.add(profileMenu);
 
+        //Make the staff area button
+        JPanel bottomPanel = new JPanel();
+        staffButton = new JButton("Staff Area");
+        bottomPanel.add(staffButton);
 
+        //Display the products
+        // productPanel (all the products) contains several productSections (one product) which contain 1 product
+        // display (product metadata) and a button to select the product
+        JPanel productPanel = new JPanel();
+        GridLayout layout = new GridLayout(0,3);
+        layout.setHgap(10);
+        layout.setVgap(5);
+        productPanel.setLayout(layout);
+        for (int i = 0; i < 10; i++){ //Display 10 products for now
+            JPanel productSection = new JPanel();
+            productSection.setLayout(new BoxLayout(productSection, BoxLayout.Y_AXIS));
+            productDisplay = new JTextArea(10, 10);
+            productDisplay.setPreferredSize(new Dimension(50, 50));
+            productDisplay.setText("Product " + (i+1));
+            productDisplay.setEditable(false);
+            JButton selectButton = new JButton("Select Product " + i);
+            productSection.add(productDisplay);
+            productSection.add(selectButton);
+            productPanel.add(productSection);
+        }
+        //Encapsulate the product panel in a scrollable panel (to make it scrollable)
+        JScrollPane scrollableProducts = new JScrollPane(productPanel);
 
-        //add components
-        panel.add(menu);
-        panel.add(staffArea);
-
-        //set component bounds (only needed by Absolute Positioning)
-        menu.setBounds (0, 0, 755, 30);
-        staffArea.setBounds (680, 40, 65, 30);
-
-        //construct components
-        product = new JTextArea (10, 20);
-
-        //adjust size and set layout
-        setPreferredSize (new Dimension (752, 431));
-        FlowLayout layout = new FlowLayout();
-        layout.setHgap (5);
-        layout.setVgap (5);
-        setLayout (layout);
-
-        //adjust size and set layout
-        setPreferredSize (new Dimension (752, 431));
-        setLayout (new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        //add components
-        panel.add(product);
-        add(panel);
+        // Add the components to the frame
+        this.setLayout(new BorderLayout());
+        this.add(menu, BorderLayout.NORTH);
+        this.add(bottomPanel, BorderLayout.SOUTH);
+        this.add(scrollableProducts, BorderLayout.CENTER);
+        staffButton.setMaximumSize(new Dimension(40, staffButton.getPreferredSize().height));
 
         this.setVisible(true);
     }
 }
+
