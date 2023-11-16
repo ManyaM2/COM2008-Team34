@@ -2,11 +2,19 @@ import java.util.List;
 
 public class Set extends Product{
     private List<Product> productCodes;
+    private int setID;
+    private String controllerType;
 
+
+    public int getSetID(){return setID;}
+    public String getControllerType(){return controllerType;}
     public List<Product> getProductCodes(){ return productCodes; }
-    public Set(String bName, String gauge, String pName, double rPrice, int sLevel, List<Product> products) {
+    public Set(int setID, String bName, String gauge, String pName, double rPrice, int sLevel, List<Product> products,
+               String controllerType) {
         super(bName, gauge, pName, rPrice, gauge, sLevel);
+        this.setID = setID;
         this.productCodes = products;
+        this.controllerType = controllerType;
     }
 
     /**

@@ -206,14 +206,14 @@ public class DatabaseOperations {
         }
         return products;
     }
-/*
-    public List<Set> getSets(Connection connection) throws SQLException {
+
+    /*public List<Set> getSets(Connection connection) throws SQLException {
         List<Set> sets = new ArrayList<>();
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
-            String sqlQuery = "SELECT s.setID,s.productCode, s.eraCode, s.partOfSetCode, s.controllerType, " +
-                    "p.productCode, p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel" +
+            String sqlQuery = "SELECT s.setID,s.productCode, s.eraCode, s.controllerType, " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel" +
                     "FROM Sets s, Products p " +
                     "WHERE p.productCode = s.productCode";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
@@ -221,19 +221,18 @@ public class DatabaseOperations {
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
-                String productCode = resultSet.getString(1);
-                String brandName  = resultSet.getString(2);
-                String productName  = resultSet.getString(3);
-                double retailPrice = resultSet.getDouble(4);
-                String gauge  = resultSet.getString(5);
-                int stockLevel = resultSet.getInt(6);
                 int setID = resultSet.getInt(1);
+                String productCode = resultSet.getString(2);
                 String eraCode  = resultSet.getString(3);
-                String partOfSetCode = resultSet.getString(4);
                 String controllerType = resultSet.getString(5);
+                String brandName  = resultSet.getString(6);
+                String productName  = resultSet.getString(7);
+                double retailPrice = resultSet.getDouble(8);
+                String gauge  = resultSet.getString(9);
+                int stockLevel = resultSet.getInt(10);
 
-
-                sets.add(new Set(setID, eraCode, partOfSetCode, controllerType));
+                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, List<Product> products,
+                        controllerType);
             }
             resultSet.close();
             statement.close();
@@ -243,13 +242,52 @@ public class DatabaseOperations {
         return sets;
     }
 
+    public List<Product> getProductOfSet(Connection connection, int partOfSetCode) throws SQLException {
+        List<Set> sets = new ArrayList<>();
+        ResultSet resultSet = null;
+        try {
+            //Get all the orders from the database
+            String sqlQuery = "SELECT s.setID,s.productCode, s.eraCode, s.controllerType, " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel" +
+                    "FROM Sets s, Products p " +
+                    "WHERE p.productCode = s.productCode";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            resultSet = statement.executeQuery(sqlQuery);
+
+            // Convert the resultSet into a list of products
+            while (resultSet.next()) {
+                int setID = resultSet.getInt(1);
+                String productCode = resultSet.getString(2);
+                String eraCode  = resultSet.getString(3);
+                String controllerType = resultSet.getString(5);
+                String brandName  = resultSet.getString(6);
+                String productName  = resultSet.getString(7);
+                double retailPrice = resultSet.getDouble(8);
+                String gauge  = resultSet.getString(9);
+                int stockLevel = resultSet.getInt(10);
+
+                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, List<Product> products,
+                        controllerType);
+            }
+            resultSet.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sets;
+    }
+
+
     public List<Controller> getController(Connection connection) throws SQLException {
         List<Controller> controllers = new ArrayList<>();
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT c.controllerID,c.productCode, c.typeName, c.partOfSetCode" +
-                    "FROM Controller c";
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel" +
+                    "FROM Controller c, Products p" +
+                    "WHERE p.productCode = c.productCode";
+
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
@@ -258,7 +296,7 @@ public class DatabaseOperations {
                 int controllerID = resultSet.getInt(1);
                 String typeName  = resultSet.getString(3);
 
-                controllers.add(new Controller(controllerID, typeName));
+                controllers.add(new Controller());
             }
             resultSet.close();
             statement.close();
@@ -317,9 +355,9 @@ public class DatabaseOperations {
             e.printStackTrace();
         }
         return rollingStocks;
-    }*/
+    }
 
-
+*/
     public void updateBankDetails(Connection connection, BankDetails details) throws SQLException {
         try {
             String sqlQuery = "UPDATE BankDetails" +
