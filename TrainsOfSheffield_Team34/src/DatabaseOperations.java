@@ -155,7 +155,7 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get the orderlines associated with the order
-            String sqlQuery = "SELECT o.lineNumber, o.orderNumber, o.productCode, o.productQuantity, o.lineCost" +
+            String sqlQuery = "SELECT o.lineNumber, o.orderNumber, o.productCode, o.productQuantity, o.lineCost " +
                     "FROM OrderLine o " +
                     "WHERE o.orderNumber = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
@@ -183,21 +183,21 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
-            String sqlQuery = "SELECT p.productCode, p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel" +
+            String sqlQuery = "SELECT p.productCode, p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Products p";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
-                String productCode = resultSet.getString(1);
-                String brandName  = resultSet.getString(2);
-                String productName  = resultSet.getString(3);
-                double retailPrice = resultSet.getDouble(4);
-                String gauge  = resultSet.getString(5);
-                int stockLevel = resultSet.getInt(6);
+                String productCode = resultSet.getString("productCode");
+                String brandName  = resultSet.getString("brandName");
+                String productName  = resultSet.getString("productName");
+                double retailPrice = resultSet.getDouble("retailPrice");
+                String gauge  = resultSet.getString("gauge");
+                int stockLevel = resultSet.getInt("stockLevel");
 
-                products.add(new Product(productCode, brandName, productName, retailPrice, gauge, stockLevel));
+                products.add(new Product(productCode, brandName, gauge, productName, retailPrice, stockLevel));
             }
             resultSet.close();
             statement.close();
