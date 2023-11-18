@@ -24,7 +24,6 @@ public class DefaultView extends JFrame {
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
         // Make menu bar
-        JMenu homeMenu = new JMenu("Home");
         JMenu productsMenu = new JMenu("Products");
         JMenuItem locomotivesItem = new JMenuItem("Locomotives");
         JMenuItem trackPacksItem = new JMenuItem("Track Packs");
@@ -40,6 +39,9 @@ public class DefaultView extends JFrame {
         productsMenu.add(trackPiecesItem);
         productsMenu.add(rollingStockItem);
 
+        JMenuItem homeItem = new JMenuItem("Home");
+        homeItem.setMaximumSize(new Dimension(45, 50));
+
         JMenu profileMenu = new JMenu("Profile");
         JMenuItem editDetailsItem = new JMenuItem("Edit Details");
         JMenuItem myOrdersItem = new JMenuItem("My Orders");
@@ -48,7 +50,7 @@ public class DefaultView extends JFrame {
         profileMenu.add(myOrdersItem);
 
         menu = new JMenuBar();
-        menu.add(homeMenu);
+        menu.add(homeItem);
         menu.add(productsMenu);
         menu.add(profileMenu);
 
@@ -61,9 +63,9 @@ public class DefaultView extends JFrame {
         JPanel productPanel = new JPanel();
         GridLayout layout = new GridLayout(0,3);
         layout.setHgap(10);
-        layout.setVgap(5);
+        layout.setVgap(0);
         productPanel.setLayout(layout);
-        List<Product> products = databaseOperations.getProduct(connection);
+        List<Product> products = databaseOperations.getProducts(connection);
         for (Product p : products){
             productPanel.add(getProductSection(p));
         }
@@ -96,7 +98,15 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Locomotives");
                 productPanel.removeAll();
-                //Display locos
+                List<Locomotive> products = null;
+                try {
+                    products = databaseOperations.getLocomotives(connection);
+                    for (Product p : products){
+                        productPanel.add(getProductSection(p));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();
                 repaint();
             }
@@ -107,7 +117,15 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Track Packs");
                 productPanel.removeAll();
-                //Display track packs
+                List<Set> products = null;
+                try {
+                    products = databaseOperations.getTrackPacks(connection);
+                    for (Product p : products){
+                        productPanel.add(getProductSection(p));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();
                 repaint();
             }
@@ -118,7 +136,15 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Train Sets");
                 productPanel.removeAll();
-                //Display train sets
+                List<Set> products = null;
+                try {
+                    products = databaseOperations.getTrainSets(connection);
+                    for (Product p : products){
+                        productPanel.add(getProductSection(p));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();
                 repaint();
             }
@@ -129,7 +155,15 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Controllers");
                 productPanel.removeAll();
-                //Display controllers
+                List<Controller> products = null;
+                try {
+                    products = databaseOperations.getControllers(connection);
+                    for (Product p : products){
+                        productPanel.add(getProductSection(p));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();
                 repaint();
             }
@@ -140,7 +174,15 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Track Pieces");
                 productPanel.removeAll();
-                //Display track pieces
+                List<Product> products = null;
+                try {
+                    products = databaseOperations.getTrackPieces(connection);
+                    for (Product p : products){
+                        productPanel.add(getProductSection(p));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();
                 repaint();
             }
@@ -151,7 +193,15 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Rolling Stock");
                 productPanel.removeAll();
-                //Display rolling stock
+                List<RollingStock> products = null;
+                try {
+                    products = databaseOperations.getRollingStock(connection);
+                    for (Product p : products){
+                        productPanel.add(getProductSection(p));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();
                 repaint();
             }
@@ -179,10 +229,21 @@ public class DefaultView extends JFrame {
             }
         });
 
-        homeMenu.addActionListener(new ActionListener() {
+        homeItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Don't know how to go back
+                productPanel.removeAll();
+                List<Product> products = null;
+                try {
+                    products = databaseOperations.getProducts(connection);
+                    for (Product p : products){
+                        productPanel.add(getProductSection(p));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                revalidate();
+                repaint();
             }
         });
     }
@@ -198,11 +259,14 @@ public class DefaultView extends JFrame {
         JButton selectButton = new JButton("Order " + p.getProductCode());
         JButton viewContentsButton = new JButton("View " + p.getProductCode() + " Contents");
 
-        productSection.setLayout(new GridLayout(2,1));
+        GridLayout layout = new GridLayout(2,1);
+        BoxLayout layout2 = new BoxLayout(productSection, BoxLayout.Y_AXIS);
+        productSection.setLayout(layout2);
 
         //Display product metadata
-        productDisplay = new JTextArea(7, 10);
-        productDisplay.setMaximumSize(new Dimension(200, 130));
+        productDisplay = new JTextArea(10, 20);
+        productDisplay.setMaximumSize(new Dimension(250, 80));
+        productDisplay.setMinimumSize(new Dimension(200, 80));
         productDisplay.setText("\n " + p.getProductCode() + " | " + p.getProductName() + "\n " + p.getBrandName() +
                 "\n " + p.getGauge() + " Gauge (" + p.getScale() + " Scale) \n ");
         char productType = p.getProductCode().charAt(0);
