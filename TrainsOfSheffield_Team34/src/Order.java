@@ -9,6 +9,8 @@ public class Order {
     private Integer quantity;
     private float price;
 
+    private LocalDate dateMade;
+
     // Constructor
     public Order(Integer orderNumber, Integer userID, OrderStatus status, List<OrderLine> orderLines) {
         this.orderNumber = orderNumber;
@@ -32,9 +34,11 @@ public class Order {
     public List<OrderLine> getOrderLines() {
         return orderLines;
     }
+
+    public LocalDate getDateMade(){ return dateMade; }
     
-    public LocalDate date() {
-        return LocalDate.now(); 
+    public void saveDate() {
+        dateMade = LocalDate.now();
     }
     
     public float totalCost(List<OrderLine> lines) {
