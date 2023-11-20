@@ -67,7 +67,7 @@ public class DefaultView extends JFrame {
         productPanel.setLayout(layout);
         List<Product> products = databaseOperations.getProducts(connection);
         for (Product p : products){
-            productPanel.add(getProductSection(p));
+            productPanel.add(getProductSection(p, connection));
         }
         //Encapsulate the product panel in a scrollable panel (to make it scrollable)
         JScrollPane scrollableProducts = new JScrollPane(productPanel);
@@ -102,7 +102,7 @@ public class DefaultView extends JFrame {
                 try {
                     products = databaseOperations.getLocomotives(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -121,7 +121,7 @@ public class DefaultView extends JFrame {
                 try {
                     products = databaseOperations.getTrackPacks(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -140,7 +140,7 @@ public class DefaultView extends JFrame {
                 try {
                     products = databaseOperations.getTrainSets(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -159,7 +159,7 @@ public class DefaultView extends JFrame {
                 try {
                     products = databaseOperations.getControllers(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -178,7 +178,7 @@ public class DefaultView extends JFrame {
                 try {
                     products = databaseOperations.getTrackPieces(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -197,7 +197,7 @@ public class DefaultView extends JFrame {
                 try {
                     products = databaseOperations.getRollingStock(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -237,7 +237,7 @@ public class DefaultView extends JFrame {
                 try {
                     products = databaseOperations.getProducts(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -253,11 +253,11 @@ public class DefaultView extends JFrame {
      * @param p the product being displayed
      * @return The panel displaying the product
      */
-    public JPanel getProductSection(Product p){
+    public JPanel getProductSection(Product p, Connection connection){
         JPanel productSection = new JPanel();
         JPanel buttonPanel = new JPanel();
         JButton selectButton = new JButton("Order " + p.getProductCode());
-        AddOrderActionListener actionListener = new AddOrderActionListener(p, this);
+        AddOrderActionListener actionListener = new AddOrderActionListener(p, this, connection);
         selectButton.addActionListener(actionListener);
         JButton viewContentsButton = new JButton("View " + p.getProductCode() + " Contents");
 

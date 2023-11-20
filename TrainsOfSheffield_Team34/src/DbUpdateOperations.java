@@ -2,6 +2,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class DbUpdateOperations {
     public void updateBankDetails(Connection connection, BankDetails details) throws SQLException {
         try {
@@ -41,35 +44,66 @@ public class DbUpdateOperations {
         }
     }
 
-    public void addOrderline(Connection connection, Product p) throws SQLException{
+    public void addOrderLine(Connection connection, Product p) throws SQLException{
         ResultSet resultSet = null;
         try {
-            //Get the user's pending orders
-            String sqlQuery = "SELECT orderNumber, userID, orderStatus, orderDate " +
-                    "FROM Orders " +
-                    "WHERE userID = ? " +
-                    "AND orderStatus = ?";
-            PreparedStatement statement = connection.prepareStatement(sqlQuery);
-            //statement.setInt(1, CurrentUser.getUserID());
-            statement.setString(2, "Pending");
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = getPendingOrders(connection);
 
-            //If there are pending orders, add an orderline to the order
+            //If there is a pending order, add an orderline to the order
             if (resultSet.next()){
-                int orderNumber = resultSet.getInt("orderNumber");
-                /*
-                String updateQuery = "INSERT INTO OrderLines Values(?,?,?,?,?)";
-                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
-                statement.setInt(1, product.getStockLevel());
-                statement.setString(2, product.getProductCode());
-                statement.executeUpdate();*/
+                int orderNumber = -1;
+                orderNumber = resultSet.getInt("orderNumber");
 
+                String updateQuery = "INSERT INTO OrderLine (orderNumber, productCode, productQuantity, lineCost) " +
+                        "Values(?,?,?,?)";
+                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                updateStatement.setInt(1, orderNumber);
+                updateStatement.setString(2, p.getProductCode());
+                updateStatement.setInt(3, 1);
+                updateStatement.setDouble(4, p.getRetailPrice());
+                updateStatement.executeUpdate();
             } //Otherwise, make a new order
             else {
+                String insertOrder = "INSERT INTO Orders (userID, orderStatus, orderDate) Values(?,?,?)";
+                PreparedStatement orderStatement = connection.prepareStatement(insertOrder);
+                orderStatement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
+                orderStatement.setString(2, "Pending");
+                orderStatement.setDate(3, java.sql.Date.valueOf(java.time.LocalDate.now()));
+                orderStatement.executeUpdate();
 
+                resultSet = getPendingOrders(connection);
+
+                int orderNumber = -1;
+                while (resultSet.next())
+                    orderNumber = resultSet.getInt("orderNumber");
+
+                String updateQuery = "INSERT INTO OrderLine (orderNumber, productCode, productQuantity, lineCost) " +
+                        "Values(?,?,?,?)";
+                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                updateStatement.setInt(1, orderNumber);
+                updateStatement.setString(2, p.getProductCode());
+                updateStatement.setInt(3, 1);
+                updateStatement.setDouble(4, p.getRetailPrice());
+                updateStatement.executeUpdate();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    //Get the pending orders of the current user
+    private ResultSet getPendingOrders(Connection connection) {
+        ResultSet resultSet = null;
+        try {
+            // Get the user's pending orders
+            String sqlQuery = "SELECT orderNumber, orderStatus FROM Orders WHERE userID = ? AND orderStatus = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
+            statement.setString(2, "Pending");
+            resultSet = statement.executeQuery();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultSet;
     }
 }
