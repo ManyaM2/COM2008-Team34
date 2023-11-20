@@ -122,7 +122,7 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
-            String sqlQuery = "SELECT o.orderNumber, o.userID, o.orderStatus, o.orderDate" +
+            String sqlQuery = "SELECT o.orderNumber, o.userID, o.orderStatus, o.orderDate " +
                     "FROM Orders o";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             resultSet = statement.executeQuery(sqlQuery);
@@ -570,7 +570,6 @@ public class DatabaseOperations {
         }
         return rollingStock;
     }
-
     public void updateBankDetails(Connection connection, BankDetails details) throws SQLException {
         try {
             String sqlQuery = "UPDATE BankDetails" +
@@ -642,5 +641,4 @@ public class DatabaseOperations {
             return false;
         }
     }
-
 }

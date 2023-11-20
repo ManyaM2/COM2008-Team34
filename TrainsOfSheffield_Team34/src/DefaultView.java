@@ -257,6 +257,8 @@ public class DefaultView extends JFrame {
         JPanel productSection = new JPanel();
         JPanel buttonPanel = new JPanel();
         JButton selectButton = new JButton("Order " + p.getProductCode());
+        AddOrderActionListener actionListener = new AddOrderActionListener(p, this);
+        selectButton.addActionListener(actionListener);
         JButton viewContentsButton = new JButton("View " + p.getProductCode() + " Contents");
 
         GridLayout layout = new GridLayout(2,1);
@@ -270,6 +272,8 @@ public class DefaultView extends JFrame {
         productDisplay.setText("\n " + p.getProductCode() + " | " + p.getProductName() + "\n " + p.getBrandName() +
                 "\n " + p.getGauge() + " Gauge (" + p.getScale() + " Scale) \n ");
         char productType = p.getProductCode().charAt(0);
+
+        // Display different data depending on the type of the product
         if (p instanceof Locomotive)
             productDisplay.append("\n " + ((Locomotive)p).getEraCode() + "\n " + ((Locomotive)p).getDccCode());
         if (p instanceof RollingStock)

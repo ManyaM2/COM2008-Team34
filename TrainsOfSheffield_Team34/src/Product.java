@@ -36,7 +36,9 @@ public class Product {
      * Increment/decrement the stock level of a product depending on the stockNum
      * @param stockNum Amount incremented/decremented - Postive integer increments, negative integer decrements
      */
-    public void updateStock(int stockNum) { stockLevel += stockNum; }
+    public void updateStock(int stockNum) {
+        stockLevel += stockNum;
+    }
 
     /**
      * @return True if a product is in stock
