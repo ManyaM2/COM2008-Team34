@@ -13,7 +13,7 @@ public class DefaultView extends JFrame {
     private JButton staffButton;
     private JTextArea productDisplay;
 
-    public DefaultView(Connection connection, User currentUser) throws SQLException {
+    public DefaultView(Connection connection) throws SQLException {
         DatabaseOperations databaseOperations = new DatabaseOperations();
         this.setTitle("Trains of Sheffield | Home");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -80,7 +80,7 @@ public class DefaultView extends JFrame {
         staffButton.setMaximumSize(new Dimension(40, staffButton.getPreferredSize().height));
 
         //Don't display the staff button if the user is not a staff/manager
-        if (!currentUser.getUserRoles().contains("staff") && !currentUser.getUserRoles().contains("manager"))
+        if (!CurrentUserManager.getCurrentUser().getUserRoles().contains("staff") && !CurrentUserManager.getCurrentUser().getUserRoles().contains("manager"))
             staffButton.setVisible(false);
 
         this.setVisible(true);

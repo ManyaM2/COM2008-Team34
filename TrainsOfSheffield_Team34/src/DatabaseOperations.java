@@ -588,4 +588,59 @@ public class DatabaseOperations {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Verifies the login credentials of a user.
+     *
+     * @param connection       The database connection.
+     * @param username         The entered username.
+     * @param enteredPassword  The entered password.
+     * @return True if login is successful, false otherwise.
+     */
+    public boolean verifyLogin(Connection connection, String username, char[] enteredPassword) {
+        try {
+            // Query the database to fetch user information
+            String sql = "SELECT userId, forename, surname, email, password, houseNumber, postCode " +
+                    "FROM Users WHERE email = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String userId = resultSet.getString("userId");
+                String storedPasswordHash = resultSet.getString("password");
+                String email = resultSet.getString("email");
+
+                // Verify the entered password against the stored hash
+                if (verifyPassword(enteredPassword, storedPasswordHash)) {
+                    return true;
+                } else {
+                    System.out.println("Incorrect password.");
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("User not found.");
+        return false;
+    }
+
+    /**
+     * Verifies a password against a stored hash.
+     *
+     * @param enteredPassword  The entered password.
+     * @param storedPasswordHash  The stored password hash.
+     * @return True if the password is verified, false otherwise.
+     */
+    private static boolean verifyPassword(char[] enteredPassword, String storedPasswordHash) {
+        try {
+            String hashedEnteredPassword = HashedPasswordGenerator.hashPassword(enteredPassword);
+            return hashedEnteredPassword.equals(storedPasswordHash);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

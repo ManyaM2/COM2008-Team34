@@ -11,6 +11,7 @@ public class Main {
         testRoles.add("staff");
         User testUser = new User("Park", "Jimin", 473892, "parkJimin@bts.com", testRoles);
         DatabaseConnectionHandler databaseConnectionHandler = new DatabaseConnectionHandler();
+        CurrentUserManager.setCurrentUser(testUser);
 
         // Execute the Swing GUI application on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {
@@ -20,7 +21,7 @@ public class Main {
                 databaseConnectionHandler.openConnection();
 
                 // Create and initialize the LoanTableDisplay view using the database connection
-                defaultView = new DefaultView(databaseConnectionHandler.getConnection(), testUser);
+                defaultView = new DefaultView(databaseConnectionHandler.getConnection());
                 defaultView.setVisible(true);
 
             } catch (Throwable t) {

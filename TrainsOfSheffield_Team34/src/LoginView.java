@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
 
 public class LoginView extends JFrame {
 
@@ -16,7 +15,7 @@ public class LoginView extends JFrame {
     private JButton loginButton;
     private JButton cancelButton;
 
-    public LoginView() throws HeadlessException {
+    public LoginView(Connection connection) throws HeadlessException {
         this.setTitle("Trains of Sheffield | Login");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -26,7 +25,7 @@ public class LoginView extends JFrame {
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
         // construct components
-        usernameLabel = new JLabel("Username:");
+        usernameLabel = new JLabel("Email:");
         passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField(15);
         usernameField = new JTextField(15);
@@ -97,11 +96,7 @@ public class LoginView extends JFrame {
         this.setVisible(true);
     }
 
-    public void verifyLogin() {
-
-    }
-
-
+    /*
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -109,4 +104,6 @@ public class LoginView extends JFrame {
             }
         });
     }
+     */
+
 }
