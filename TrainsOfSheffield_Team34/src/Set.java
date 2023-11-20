@@ -29,4 +29,12 @@ public class Set extends Product{
         }
         return era;
     }
+
+    public String productsAsString(){
+        String returnString = "";
+        for (Product p : productCodes){
+            returnString += p.getProductCode() + " " + p.getProductName() + "\n";
+        }
+        return returnString;
+    }
 }

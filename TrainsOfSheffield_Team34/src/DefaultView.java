@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +21,7 @@ public class DefaultView extends JFrame {
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
-        this.setSize(screenSize.width / 2, screenSize.height / 2);
+        this.setSize((screenSize.width / 2) + 100, screenSize.height / 2);
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
         // Make menu bar
@@ -62,7 +63,7 @@ public class DefaultView extends JFrame {
         // Display the products
         JPanel productPanel = new JPanel();
         GridLayout layout = new GridLayout(0,3);
-        layout.setHgap(10);
+        layout.setHgap(5);
         layout.setVgap(0);
         productPanel.setLayout(layout);
         List<Product> products = databaseOperations.getProducts(connection);
@@ -256,14 +257,25 @@ public class DefaultView extends JFrame {
     public JPanel getProductSection(Product p, Connection connection){
         JPanel productSection = new JPanel();
         JPanel buttonPanel = new JPanel();
+
+        //Make a select button and add product to order when pressed
         JButton selectButton = new JButton("Order " + p.getProductCode());
         AddOrderActionListener actionListener = new AddOrderActionListener(p, this, connection);
         selectButton.addActionListener(actionListener);
-        JButton viewContentsButton = new JButton("View " + p.getProductCode() + " Contents");
 
-        GridLayout layout = new GridLayout(2,1);
-        BoxLayout layout2 = new BoxLayout(productSection, BoxLayout.Y_AXIS);
-        productSection.setLayout(layout2);
+        //Make a view set contents button and display set contents when pressed
+        JButton viewContentsButton = new JButton("View " + p.getProductCode() + " Contents");
+        viewContentsButton.setMaximumSize(new Dimension(100,30));
+        viewContentsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(viewContentsButton,  ((Set)p).productsAsString(), (p.getProductCode() +
+                        " Contents"), 1);
+            }
+        });
+
+        BoxLayout layout = new BoxLayout(productSection, BoxLayout.Y_AXIS);
+        productSection.setLayout(layout);
 
         //Display product metadata
         productDisplay = new JTextArea(10, 20);
@@ -284,8 +296,6 @@ public class DefaultView extends JFrame {
             if (p.getProductCode().charAt(0) == 'M')
                 productDisplay.append("\n " + ((Set)p).getEra() + "\n Controller Type: " +
                         ((Set)p).getControllerType());
-            else
-                productDisplay.append("\n " + ((Set)p).getEra());
             buttonPanel.add(viewContentsButton);
         }
 

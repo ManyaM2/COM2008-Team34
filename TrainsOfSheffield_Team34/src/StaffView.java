@@ -364,7 +364,7 @@ public class StaffView extends JFrame {
         orderDisplay.setMaximumSize(new Dimension(250, 80));
         orderDisplay.setMinimumSize(new Dimension(200, 80));
         orderDisplay.setText("\n " + o.getOrderNumber() + " | " + o.getOrderLines() + " | " + o.getUserID() + "\n " + o.getStatus() +
-                "\n " + o.date() + "\n"  );
+                "\n " + o.getDateMade() + "\n"  );
 
         buttonPanel.add(fulfillButton);
         buttonPanel.add(deleteButton);

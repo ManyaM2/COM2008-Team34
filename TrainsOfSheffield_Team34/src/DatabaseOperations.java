@@ -342,15 +342,13 @@ public class DatabaseOperations {
         List<Product> trackPieces = new ArrayList<>();
         ResultSet resultSet = null;
         try {
-            //Get all the products with a product code starting with 'R'
-            String sqlQuery = "SELECT productCode, brandName, productName, retailPrice, gauge, stockLevel, " +
-                    "partOfSetCode " +
-                    "FROM Products " +
-                    "WHERE productCode LIKE 'R%'" +
-                    "AND partOfSetCode = ?";
+            // Get all the products with a product code starting with 'R'
+            String sqlQuery = "SELECT productCode, brandName, productName, retailPrice, gauge, stockLevel, partOfSetCode " +
+                    "FROM Products WHERE productCode LIKE 'R%' AND partOfSetCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
+
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
