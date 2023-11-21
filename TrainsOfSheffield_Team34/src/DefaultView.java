@@ -91,7 +91,16 @@ public class DefaultView extends JFrame {
         staffButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Go to the staff view
+                // Close the current window
+                dispose();
+                // Open a new window
+                StaffView newWindow = null;
+                try {
+                    newWindow = new StaffView(connection);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                newWindow.setVisible(true);
             }
         });
         locomotivesItem.addActionListener(new ActionListener() {

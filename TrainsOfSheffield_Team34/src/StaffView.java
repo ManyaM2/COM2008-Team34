@@ -16,7 +16,7 @@ public class StaffView extends JFrame {
     private JTextArea productDisplay;
     private JTextArea orderDisplay;
 
-    public StaffView(Connection connection, User currentUser) throws SQLException {
+    public StaffView(Connection connection) throws SQLException {
         DatabaseOperations databaseOperations = new DatabaseOperations();
         this.setTitle("Trains of Sheffield | Home");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,7 +85,7 @@ public class StaffView extends JFrame {
         this.add(belowPanel, BorderLayout.SOUTH);
         this.add(scrollableProducts, BorderLayout.CENTER);
 
-        if (!currentUser.getUserRoles().contains("manager"))
+        if (!CurrentUserManager.getCurrentUser().getUserRoles().contains("manager"))
             managerButton.setVisible(false);
         this.setVisible(true);
 
