@@ -144,6 +144,32 @@ public class DatabaseOperations {
         return orders;
     }
 
+    public List<Order> getOrders(Connection connection, User user) throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        ResultSet resultSet = null;
+        try {
+            //Get all the orders from the database
+            String sqlQuery = "SELECT orderNumber, orderStatus, orderDate " +
+                    "FROM Orders WHERE userID = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, user.getUserID());
+            resultSet = statement.executeQuery();
+
+            // Convert the resultSet into a list of orders
+            while (resultSet.next()) {
+                int orderNumber = resultSet.getInt("orderNumber");
+                OrderStatus orderStatus = OrderStatus.valueOf(resultSet.getString("orderStatus").toUpperCase());
+                List<OrderLine> orderlines = getOrderline(connection, orderNumber);
+                orders.add(new Order(orderNumber, user.getUserID(), orderStatus, orderlines));
+            }
+            resultSet.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orders;
+    }
+
     /**
      * @param connection
      * @param orderNum The order containing the orderLines you are getting
@@ -160,7 +186,7 @@ public class DatabaseOperations {
                     "WHERE o.orderNumber = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setInt(1, orderNum);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
 
             // Add the orderlines to the list of orderlines
             while (resultSet.next()) {
@@ -568,22 +594,36 @@ public class DatabaseOperations {
         }
         return rollingStock;
     }
-    public void updateBankDetails(Connection connection, BankDetails details) throws SQLException {
+
+    /**
+     * Get a list of integers representing the quanity of products in a set
+     * @param connection
+     * @param set
+     * @return
+     * @throws SQLException
+     */
+    public List<Integer> getComponentsQuantity(Connection connection, Set set) throws SQLException {
+        List<Integer> quantities = new ArrayList<>();
+        ResultSet resultSet = null;
         try {
-            String sqlQuery = "UPDATE BankDetails" +
-                    "SET cardName = ?, cardNumber = ?, holderName = ?, securityCode = ? " +
-                    "WHERE bankDetailsID = ?";
+            //Get the rolling stock with the same set code
+            String sqlQuery = "SELECT quantity FROM ProductsInSet WHERE setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
-            statement.setString(1, details.getCardName());
-            statement.setInt(2, details.getCardNumber());
-            statement.setString(3, details.getHolderName());
-            statement.setString(4, details.getSecurityCode());
-            statement.setInt(5, details.getBankDetailsID());
-            statement.executeUpdate(sqlQuery);
+            statement.setString(1, set.getProductCode());
+            resultSet = statement.executeQuery();
+
+            // Convert the resultSet into a list of products
+            while (resultSet.next()) {
+                int quantity  = resultSet.getInt("quantity");
+
+                quantities.add(quantity);
+            }
+            resultSet.close();
             statement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return quantities;
     }
 
     /**

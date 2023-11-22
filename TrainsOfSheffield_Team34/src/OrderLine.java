@@ -14,6 +14,10 @@ public class OrderLine {
         return productQuantity;
     }
 
+    public void setProductQuantity(int q) {
+        productQuantity = q;
+    }
+
     public int getLineNumber() {
         return lineNumber;
     }

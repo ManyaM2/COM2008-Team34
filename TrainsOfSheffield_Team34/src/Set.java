@@ -1,3 +1,5 @@
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class Set extends Product{
@@ -30,10 +32,23 @@ public class Set extends Product{
         return era;
     }
 
-    public String productsAsString(){
+    /**
+     * Returns a string of all the products in the set -- Example: "4x R1234 Single Straight"
+     * @param connection the database connection
+     * @return
+     */
+    public String productsAsString(Connection connection){
+        DatabaseOperations dbOps = new DatabaseOperations();
         String returnString = "";
-        for (Product p : productCodes){
-            returnString += p.getProductCode() + " " + p.getProductName() + "\n";
+        try {
+            List<Integer> pQuanities = dbOps.getComponentsQuantity(connection, this);
+            for (int i = 0; i < productCodes.size(); i++){
+                Product p = productCodes.get(i);
+                int pAmount = pQuanities.get(i);
+                returnString += pAmount + "x " + p.getProductCode() + " " + p.getProductName() + "\n";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return returnString;
     }

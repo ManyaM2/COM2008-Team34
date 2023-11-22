@@ -1,18 +1,21 @@
 import javax.swing.*;
-import javax.xml.crypto.Data;
+import javax.swing.border.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class DefaultView extends JFrame {
     private JMenuBar menu;
     private JButton staffButton;
     private JTextArea productDisplay;
+    private DecimalFormat moneyFormat = new DecimalFormat("0.00");
+    private JPanel productPanel;
 
     public DefaultView(Connection connection) throws SQLException {
         DatabaseOperations databaseOperations = new DatabaseOperations();
@@ -61,7 +64,7 @@ public class DefaultView extends JFrame {
         bottomPanel.add(staffButton);
 
         // Display the products
-        JPanel productPanel = new JPanel();
+        productPanel = new JPanel();
         GridLayout layout = new GridLayout(0,3);
         layout.setHgap(5);
         layout.setVgap(0);
@@ -127,6 +130,10 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Track Packs");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Set> products = null;
                 try {
                     products = databaseOperations.getTrackPacks(connection);
@@ -146,6 +153,10 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Train Sets");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Set> products = null;
                 try {
                     products = databaseOperations.getTrainSets(connection);
@@ -165,6 +176,10 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Controllers");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Controller> products = null;
                 try {
                     products = databaseOperations.getControllers(connection);
@@ -184,6 +199,10 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Track Pieces");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Product> products = null;
                 try {
                     products = databaseOperations.getTrackPieces(connection);
@@ -203,6 +222,10 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Rolling Stock");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<RollingStock> products = null;
                 try {
                     products = databaseOperations.getRollingStock(connection);
@@ -222,6 +245,10 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Profile - Edit Details");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 //Edit details
                 revalidate();
                 repaint();
@@ -233,7 +260,17 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Profile - My Orders");
                 productPanel.removeAll();
-                //Display + edit orders
+                BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
+                productPanel.setLayout(layout);
+                List<Order> orders = null;
+                try {
+                    orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+                    for (Order o : orders){
+                        productPanel.add(getOrderPanel(o, connection));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
                 revalidate();
                 repaint();
             }
@@ -242,7 +279,12 @@ public class DefaultView extends JFrame {
         homeItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                setTitle("Trains of Sheffield | Home");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Product> products = null;
                 try {
                     products = databaseOperations.getProducts(connection);
@@ -278,8 +320,8 @@ public class DefaultView extends JFrame {
         viewContentsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(viewContentsButton,  ((Set)p).productsAsString(), (p.getProductCode() +
-                        " Contents"), 1);
+                JOptionPane.showMessageDialog(viewContentsButton,  ((Set)p).productsAsString(connection),
+                        (p.getProductCode() + " Contents"), 1);
             }
         });
 
@@ -320,6 +362,124 @@ public class DefaultView extends JFrame {
         productSection.add(productDisplay);
         productSection.add(buttonPanel);
         return productSection;
+    }
+
+    public JPanel getOrderPanel(Order o, Connection connection){
+        DatabaseOperations dbOps = new DatabaseOperations();
+
+        // Set the layout and border of the order section
+        JPanel orderPanel = new JPanel();
+        GridLayout layout = new GridLayout(0,3);
+        layout.setHgap(5);
+        layout.setVgap(0);
+        orderPanel.setLayout(layout);
+        TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                ("Order " + o.getOrderNumber() + " | Status: " + o.getStatus()) + " | " + o.getDateMade());
+        title.setTitleJustification(TitledBorder.LEFT);
+        orderPanel.setBorder(title);
+
+        // Add the products to the order section
+        for (OrderLine ol : o.getOrderLines()){
+            orderPanel.add(getOrderLine(ol, connection));
+        }
+
+        // Add a button to confirm the order
+        if (o.getStatus() == OrderStatus.PENDING){
+            JPanel buttonPanel = new JPanel();
+            JButton confirmButton = new JButton("Confirm order");
+            confirmButton.setMaximumSize(new Dimension(100,30));
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
+                    //TODO - Confirm an order, if the order is confirmed for the first time, request banking details
+                    // Put a haveConfirmed field in the Users table? -- Remember Validation!!
+                }
+            });
+
+            buttonPanel.add(confirmButton);
+            orderPanel.add(buttonPanel);
+        }
+
+        return orderPanel;
+    }
+
+    public JPanel getOrderLine(OrderLine ol, Connection connection){
+        DatabaseOperations dbOps = new DatabaseOperations();
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        JPanel orderLineSection = new JPanel();
+        JPanel buttonPanel = new JPanel();
+        String pCode = ol.getProductCode();
+
+        //Get the product represented in the orderLine
+        Product lineProduct = null;
+        try {
+            List<Product> products = dbOps.getProducts(connection);
+            for (Product p : products){
+                if (p.getProductCode().equals(pCode) && p != null)
+                    lineProduct = p;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Make a button to remove the orderline from the order
+        JButton removeOrderLineButton = new JButton("Remove");
+        removeOrderLineButton.setMaximumSize(new Dimension(100,30));
+        removeOrderLineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    dbUpdateOps.removeOrderLine(connection, ol);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                JOptionPane.showMessageDialog(removeOrderLineButton, "Orderline removed");
+            }
+        });
+
+        //Make a spinner to edit the quantity of the product
+        JSpinner selectQuantity = new JSpinner(new SpinnerNumberModel(ol.getProductQuantity(), 1,
+                lineProduct.getStockLevel(), 1));
+        JLabel qLabel = new JLabel("Edit quantity: ");
+        JSpinner finalSelectQuantity = selectQuantity;
+        selectQuantity.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                ol.setProductQuantity((int)finalSelectQuantity.getValue());
+                try {
+                    dbUpdateOps.updateOrderLineQuantity(connection, ol);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        BoxLayout layout = new BoxLayout(orderLineSection, BoxLayout.Y_AXIS);
+        orderLineSection.setLayout(layout);
+
+        //Display orderline metadata
+        JTextArea orderlineDisplay = new JTextArea(10, 20);
+        orderlineDisplay.setMaximumSize(new Dimension(250, 80));
+        orderlineDisplay.setMinimumSize(new Dimension(200, 80));
+        if (lineProduct != null){
+            float lineCost = ol.lineCost(ol.getProductQuantity(), (float)lineProduct.getRetailPrice());
+            orderlineDisplay.setText(String.format("\n " + ol.getProductCode() + " | " + lineProduct.getProductName() +
+                    "\n " + lineProduct.getBrandName() + "\n Product Quantity: " + ol.getProductQuantity() +
+                    "\n Line cost: £" + moneyFormat.format(lineCost)));
+        }
+        orderlineDisplay.setEditable(false);
+
+        buttonPanel.add(qLabel);
+        buttonPanel.add(finalSelectQuantity);
+        buttonPanel.add(removeOrderLineButton);
+        orderLineSection.add(orderlineDisplay);
+        orderLineSection.add(buttonPanel);
+        TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                ("Orderline " + ol.getLineNumber()));
+        title.setTitleJustification(TitledBorder.LEFT);
+        orderLineSection.setBorder(title);
+        return orderLineSection;
     }
 }
 

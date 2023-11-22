@@ -91,6 +91,35 @@ public class DbUpdateOperations {
         }
     }
 
+    public void removeOrderLine(Connection connection, OrderLine ol) throws SQLException{
+        try {
+            String updateQuery = "DELETE FROM OrderLine WHERE lineNumber = ?";
+            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+            updateStatement.setInt(1, ol.getLineNumber());
+            updateStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the quantity of an orderline (sets productQuantity to ol.getProductQuantity())
+     * @param connection
+     * @param ol
+     * @throws SQLException
+     */
+    public void updateOrderLineQuantity(Connection connection, OrderLine ol) throws SQLException{
+        try {
+            String sqlQuery = "UPDATE OrderLine SET productQuantity = ? WHERE lineNumber = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, ol.getProductQuantity());
+            statement.setInt(2, ol.getLineNumber());
+            statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //Get the pending orders of the current user
     private ResultSet getPendingOrders(Connection connection) {
         ResultSet resultSet = null;

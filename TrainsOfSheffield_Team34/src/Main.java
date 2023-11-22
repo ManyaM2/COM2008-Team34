@@ -22,6 +22,7 @@ public class Main {
 
                 // Create and initialize the LoanTableDisplay view using the database connection
                 defaultView = new DefaultView(databaseConnectionHandler.getConnection());
+                //staffView = new StaffView(databaseConnectionHandler.getConnection(), testUser);
                 defaultView.setVisible(true);
 
             } catch (Throwable t) {
