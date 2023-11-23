@@ -258,21 +258,7 @@ public class DefaultView extends JFrame {
         myOrdersItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Profile - My Orders");
-                productPanel.removeAll();
-                BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
-                productPanel.setLayout(layout);
-                List<Order> orders = null;
-                try {
-                    orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
-                    for (Order o : orders){
-                        productPanel.add(getOrderPanel(o, connection));
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-                revalidate();
-                repaint();
+                reloadMyOrders(connection, databaseOperations);
             }
         });
 
@@ -315,7 +301,7 @@ public class DefaultView extends JFrame {
         selectButton.addActionListener(actionListener);
 
         //Make a view set contents button and display set contents when pressed
-        JButton viewContentsButton = new JButton("View " + p.getProductCode() + " Contents");
+        JButton viewContentsButton = new JButton("View Set Contents");
         viewContentsButton.setMaximumSize(new Dimension(100,30));
         viewContentsButton.addActionListener(new ActionListener() {
             @Override
@@ -391,9 +377,10 @@ public class DefaultView extends JFrame {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
+                    //JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
                     //TODO - Confirm an order, if the order is confirmed for the first time, request banking details
                     // Put a haveConfirmed field in the Users table? -- Remember Validation!!
+                    display();
                 }
             });
 
@@ -435,6 +422,7 @@ public class DefaultView extends JFrame {
                     ex.printStackTrace();
                 }
                 JOptionPane.showMessageDialog(removeOrderLineButton, "Orderline removed");
+                reloadMyOrders(connection, dbOps);
             }
         });
 
@@ -452,6 +440,7 @@ public class DefaultView extends JFrame {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
+                reloadMyOrders(connection, dbOps);
             }
         });
 
@@ -480,6 +469,46 @@ public class DefaultView extends JFrame {
         title.setTitleJustification(TitledBorder.LEFT);
         orderLineSection.setBorder(title);
         return orderLineSection;
+    }
+
+    public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations){
+        setTitle("Trains of Sheffield | Profile - My Orders");
+        productPanel.removeAll();
+        BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
+        productPanel.setLayout(layout);
+        List<Order> orders = null;
+        try {
+            orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+            for (Order o : orders){
+                productPanel.add(getOrderPanel(o, connection));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        revalidate();
+        repaint();
+    }
+
+    private void display() {
+        String[] items = {"One", "Two", "Three", "Four", "Five"};
+        JComboBox<String> combo = new JComboBox<>(items);
+        JTextField field1 = new JTextField("1234.56");
+        JTextField field2 = new JTextField("9876.54");
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(combo);
+        panel.add(new JLabel("Field 1:"));
+        panel.add(field1);
+        panel.add(new JLabel("Field 2:"));
+        panel.add(field2);
+        int result = JOptionPane.showConfirmDialog(null, panel, "Test",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            System.out.println(combo.getSelectedItem()
+                    + " " + field1.getText()
+                    + " " + field2.getText());
+        } else {
+            System.out.println("Cancelled");
+        }
     }
 }
 
