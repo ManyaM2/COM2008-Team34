@@ -6,17 +6,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class DbUpdateOperations {
-    public void updateBankDetails(Connection connection, BankDetails details) throws SQLException {
+    public void updateBankDetails(Connection connection, BankDetails bd) throws SQLException {
         try {
             String sqlQuery = "UPDATE BankDetails " +
                     "SET cardName = ?, cardNumber = ?, holderName = ?, securityCode = ? " +
-                    "WHERE bankDetailsID = ?";
+                    "WHERE userID = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
-            statement.setString(1, details.getCardName());
-            statement.setInt(2, details.getCardNumber());
-            statement.setString(3, details.getHolderName());
-            statement.setString(4, details.getSecurityCode());
-            statement.setInt(5, details.getBankDetailsID());
+            statement.setString(1, bd.getCardName());
+            statement.setString(2, bd.getCardNumber());
+            statement.setString(3, bd.getHolderName());
+            statement.setInt(4, bd.getSecurityCode());
+            statement.setInt(5, CurrentUserManager.getCurrentUser().getUserID());
             statement.executeUpdate(sqlQuery);
             statement.close();
         } catch (Exception e) {
@@ -115,6 +115,60 @@ public class DbUpdateOperations {
             statement.setInt(1, ol.getProductQuantity());
             statement.setInt(2, ol.getLineNumber());
             statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the status of an order to the status stored in the order instance
+     * @param connection
+     * @param o the order instance
+     * @throws SQLException
+     */
+    public void updateOrderStatus(Connection connection, Order o) throws SQLException{
+        try{
+            String sqlQuery = "UPDATE Orders SET orderStatus = ? WHERE orderNumber = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            String status = o.getStatus().toString().toLowerCase();
+            status = Character.toUpperCase(status.charAt(0)) + status.substring(1);
+            statement.setString(1, status);
+            statement.setInt(2, o.getOrderNumber());
+            statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Set 'haveConfirmed' = true for the current user
+     * @param connection
+     * @throws SQLException
+     */
+    public void setConfirmed(Connection connection) throws SQLException{
+        try{
+            String sqlQuery = "UPDATE Users SET haveConfirmed = TRUE WHERE userID = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
+            statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addBankingDetails(Connection connection, BankDetails bd) throws SQLException {
+        ResultSet resultSet = null;
+        try{
+            String updateQuery = "INSERT INTO BankDetails (userID, cardName, cardNumber, expiryDate, holderName, " +
+                    "securityCode) Values(?,?,?,?,?,?)";
+            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+            updateStatement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
+            updateStatement.setString(2, bd.getCardName());
+            updateStatement.setString(3, bd.getCardNumber());
+            updateStatement.setString(4, bd.getExpiryDate());
+            updateStatement.setString(5, bd.getHolderName());
+            updateStatement.setInt(6, bd.getSecurityCode());
+            updateStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }

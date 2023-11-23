@@ -1,17 +1,16 @@
 public class BankDetails {
 
     private String cardName;
-    private Integer cardNumber;
+    private String cardNumber;
     private String expiryDate;
     private String holderName;
-    private String securityCode;
-    private int bankDetailsID;
+    private int securityCode;
 
     public String getCardName() {
         return cardName;
     }
 
-    public Integer getCardNumber() {
+    public String getCardNumber() {
         return cardNumber;
     }
 
@@ -23,18 +22,15 @@ public class BankDetails {
         return holderName;
     }
 
-    public String getSecurityCode() {
+    public int getSecurityCode() {
         return securityCode;
     }
 
-    public int getBankDetailsID(){ return bankDetailsID; }
-
-    public BankDetails (String cName, Integer cNumber, String date, String hName, String code, int id) {
+    public BankDetails (String cName, String cNumber, String date, String hName, int code) {
         this.cardName = cName;
         this.cardNumber = cNumber;
         this.expiryDate = date;
         this.holderName = hName;
         this.securityCode = code;
-        this.bankDetailsID = id;
     }
 }

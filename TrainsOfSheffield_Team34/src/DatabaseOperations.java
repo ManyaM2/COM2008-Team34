@@ -626,6 +626,27 @@ public class DatabaseOperations {
         return quantities;
     }
 
+    public boolean checkIfConfirmed(Connection connection) throws SQLException {
+        boolean haveConfirmed = false;
+        ResultSet resultSet = null;
+        try {
+            String sqlQuery = "SELECT haveConfirmed FROM Users WHERE userID = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
+            resultSet = statement.executeQuery();
+
+            // Convert the resultSet into a list of products
+            while (resultSet.next()) {
+                haveConfirmed = resultSet.getBoolean("haveConfirmed");
+            }
+            resultSet.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return haveConfirmed;
+    }
+
     /**
      * Verifies the login credentials of a user.
      *

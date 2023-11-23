@@ -36,6 +36,8 @@ public class Order {
     }
 
     public LocalDate getDateMade(){ return dateMade; }
+
+    public void setStatus(OrderStatus s){ status = s; }
     
     public void saveDate() {
         dateMade = LocalDate.now();

@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.time.Year;
 import java.util.List;
 
 public class DefaultView extends JFrame {
@@ -352,6 +353,7 @@ public class DefaultView extends JFrame {
 
     public JPanel getOrderPanel(Order o, Connection connection){
         DatabaseOperations dbOps = new DatabaseOperations();
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
 
         // Set the layout and border of the order section
         JPanel orderPanel = new JPanel();
@@ -366,7 +368,7 @@ public class DefaultView extends JFrame {
 
         // Add the products to the order section
         for (OrderLine ol : o.getOrderLines()){
-            orderPanel.add(getOrderLine(ol, connection));
+            orderPanel.add(getOrderLine(connection, ol, o));
         }
 
         // Add a button to confirm the order
@@ -377,10 +379,19 @@ public class DefaultView extends JFrame {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    //JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
-                    //TODO - Confirm an order, if the order is confirmed for the first time, request banking details
-                    // Put a haveConfirmed field in the Users table? -- Remember Validation!!
-                    display();
+
+                    try {
+                        if (!dbOps.checkIfConfirmed(connection))
+                            addBankDetails(connection, o);
+                        else {
+                            o.setStatus(OrderStatus.CONFIRMED);
+                            dbUpdateOps.updateOrderStatus(connection, o);
+                            JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    reloadMyOrders(connection, dbOps);
                 }
             });
 
@@ -391,7 +402,7 @@ public class DefaultView extends JFrame {
         return orderPanel;
     }
 
-    public JPanel getOrderLine(OrderLine ol, Connection connection){
+    public JPanel getOrderLine(Connection connection, OrderLine ol, Order o){
         DatabaseOperations dbOps = new DatabaseOperations();
         DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
         JPanel orderLineSection = new JPanel();
@@ -459,9 +470,11 @@ public class DefaultView extends JFrame {
         }
         orderlineDisplay.setEditable(false);
 
-        buttonPanel.add(qLabel);
-        buttonPanel.add(finalSelectQuantity);
-        buttonPanel.add(removeOrderLineButton);
+        if (o.getStatus() == OrderStatus.PENDING){
+            buttonPanel.add(qLabel);
+            buttonPanel.add(finalSelectQuantity);
+            buttonPanel.add(removeOrderLineButton);
+        }
         orderLineSection.add(orderlineDisplay);
         orderLineSection.add(buttonPanel);
         TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
@@ -478,7 +491,25 @@ public class DefaultView extends JFrame {
         productPanel.setLayout(layout);
         List<Order> orders = null;
         try {
+            // Display pending orders
             orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+            orders.removeIf(n -> (n.getStatus() != OrderStatus.PENDING));
+            for (Order o : orders){
+                // Only display an order if it has 1 or more orderlines
+                if (!o.getOrderLines().isEmpty())
+                    productPanel.add(getOrderPanel(o, connection));
+            }
+
+            // Display confirmed orders
+            orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+            orders.removeIf(n -> (n.getStatus() != OrderStatus.CONFIRMED));
+            for (Order o : orders){
+                productPanel.add(getOrderPanel(o, connection));
+            }
+
+            // Display fulfilled orders
+            orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+            orders.removeIf(n -> (n.getStatus() != OrderStatus.FULFILLED));
             for (Order o : orders){
                 productPanel.add(getOrderPanel(o, connection));
             }
@@ -489,26 +520,74 @@ public class DefaultView extends JFrame {
         repaint();
     }
 
-    private void display() {
-        String[] items = {"One", "Two", "Three", "Four", "Five"};
-        JComboBox<String> combo = new JComboBox<>(items);
-        JTextField field1 = new JTextField("1234.56");
-        JTextField field2 = new JTextField("9876.54");
+    private void addBankDetails(Connection connection, Order o) {
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+
+        // Set up comboboxes for the expiry date
+        String[] months = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
+        JComboBox<String> expiryMonth = new JComboBox<>(months);
+        int currentYear = Year.now().getValue();
+        Integer[] expiryYears = new Integer[8];
+        for(int i = currentYear; i < currentYear + 8;i++)
+            expiryYears[i - (currentYear)] = i % 1000;
+        JComboBox<Integer> expiryYear = new JComboBox<>(expiryYears);
+
+        //Add fields and labels to the form
+        JTextField cardName = new JTextField("");
+        JTextField cardHolderName = new JTextField("");
+        JTextField cardNumber = new JTextField("");
+        JTextField securityCode = new JTextField("");
         JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(combo);
-        panel.add(new JLabel("Field 1:"));
-        panel.add(field1);
-        panel.add(new JLabel("Field 2:"));
-        panel.add(field2);
-        int result = JOptionPane.showConfirmDialog(null, panel, "Test",
+        panel.add(new JLabel("Bank card name "));
+        panel.add(cardName);
+        panel.add(new JLabel("Bank card holder name "));
+        panel.add(cardHolderName);
+        panel.add(new JLabel("Bank card number "));
+        panel.add(cardNumber);
+        panel.add(new JLabel("Security code "));
+        panel.add(securityCode);
+        panel.add(new JLabel("Expiry date (mm/yy) "));
+        panel.add(expiryMonth);
+        panel.add(expiryYear);
+
+        // Process results
+        int result = JOptionPane.showConfirmDialog(null, panel, "Add Banking Details",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            System.out.println(combo.getSelectedItem()
-                    + " " + field1.getText()
-                    + " " + field2.getText());
-        } else {
-            System.out.println("Cancelled");
-        }
+            try {
+                String cName = cardName.getText();
+                String cHolderName = cardHolderName.getText();
+                String cNum = cardNumber.getText().replaceAll("\\s", "");
+                String secCode = securityCode.getText();
+                String expiryDate = expiryMonth.getSelectedItem() + "/" + expiryYear.getSelectedItem();
+
+                // Ensure the details entered are of the correct length
+                if (cNum.length() != 16 || secCode.length() != 3 || cName.isEmpty() || cHolderName.isEmpty()){
+                    JOptionPane.showMessageDialog(panel,"Confirmation failed: Invalid details provided ",
+                            "Invalid Entry", 0);
+                }
+                else{
+                    // Exception caught if parse fails
+                    Integer.parseInt(cNum.substring(0,7));
+                    Integer.parseInt(cNum.substring(8));
+                    Integer.parseInt(secCode);
+                    BankDetails bd = new BankDetails(cName, cNum, expiryDate, cHolderName, Integer.parseInt(secCode));
+                    try {
+                        dbUpdateOps.addBankingDetails(connection, bd);
+                        o.setStatus(OrderStatus.CONFIRMED);
+                        dbUpdateOps.updateOrderStatus(connection, o);
+                        dbUpdateOps.setConfirmed(connection);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    JOptionPane.showMessageDialog(panel, "Order confirmed");
+                }
+            }
+            catch (NumberFormatException e) {  // Ensure card number and security code are integer entries
+                JOptionPane.showMessageDialog(panel, "Confirmation failed: Invalid details provided",
+                        "Invalid Entry", 0);
+            }
+        } else { }
     }
 }
 
