@@ -44,8 +44,8 @@ public class LoginView extends JFrame {
         this.add(loginButton);
         this.add(cancelButton);
 
-        // set component bounds (only needed by Absolute Positioning)
-        usernameLabel.setBounds(220, 125, 75, 25);
+        // set component bounds
+        usernameLabel.setBounds(245, 125, 75, 25);
         passwordLabel.setBounds(220, 165, 75, 25);
         passwordField.setBounds(290, 165, 250, 25);
         usernameField.setBounds(290, 125, 250, 25);
@@ -67,11 +67,11 @@ public class LoginView extends JFrame {
                     // Secure disposal of the password
                     Arrays.fill(passwordChars, '\u0000');
 
-                    // Close the current window
-                    dispose();
-
                     //Show a successful login message
                     JOptionPane.showMessageDialog(LoginView.this, "Welcome user " + username, "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+
+                    // Close the current window
+                    dispose();
 
                     DefaultView defaultView = null;
                     try {
@@ -83,27 +83,59 @@ public class LoginView extends JFrame {
 
                 } else {
                     // Show an unsuccessful login message
-                    JOptionPane.showMessageDialog(LoginView.this, "Invalid username or password", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                    int option = JOptionPane.showConfirmDialog(LoginView.this,
+                            "Invalid username or password. Do you want to create a new account?",
+                            "Login Failed", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-                    // Secure disposal of the password
-                    Arrays.fill(passwordChars, '\u0000');
+                    // Redirect to the sign-up screen
+                    if (option == JOptionPane.YES_OPTION) {
+
+                        // Close the current window
+                        dispose();
+
+                        /*
+                        SignupView signupView = null;
+                        try {
+                            signupView = new SignupView(connection);
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        signupView.setVisible(true);
+                         */
+
+
+                    } else {
+                        // Secure disposal of the password
+                        Arrays.fill(passwordChars, '\u0000');
+                    }
                 }
                 // Secure disposal of the password
                 Arrays.fill(passwordChars, '\u0000');
             }
         });
 
+        // Create an ActionListener for the cancel button
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Clear the text in the username and password fields
+                usernameField.setText("");
+                passwordField.setText("");
+            }
+        });
+
+
         this.setVisible(true);
     }
 
-    /*
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new LoginView();
+                DatabaseConnectionHandler databaseConnectionHandler = new DatabaseConnectionHandler();
+                new LoginView(databaseConnectionHandler.getConnection());
             }
         });
     }
-     */
+
 
 }

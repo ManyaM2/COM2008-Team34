@@ -1,6 +1,5 @@
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 /**
  * The HashedPasswordGenerator class provides methods to hash passwords using SHA-256.
