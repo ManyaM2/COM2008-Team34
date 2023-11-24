@@ -9,14 +9,21 @@ public class DbUpdateOperations {
     public void updateBankDetails(Connection connection, BankDetails bd) throws SQLException {
         try {
             String sqlQuery = "UPDATE BankDetails " +
-                    "SET cardName = ?, cardNumber = ?, holderName = ?, securityCode = ? " +
+                    "SET cardName = ?, cardNumber = ?, holderName = ?, securityCode = ?, expiryDate = ? " +
                     "WHERE userID = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
+
+            // Ensure the bank details are hashed before they are added to the database
+            String hashedCardNumber = HashedPasswordGenerator.hashPassword(bd.getCardNumber().toCharArray());
+            String hashedExpDate = HashedPasswordGenerator.hashPassword(bd.getExpiryDate().toCharArray());
+            String hashedSecCode = HashedPasswordGenerator.hashPassword(bd.getSecurityCode().toCharArray());
+
             statement.setString(1, bd.getCardName());
-            statement.setString(2, bd.getCardNumber());
+            statement.setString(2, hashedCardNumber);
             statement.setString(3, bd.getHolderName());
-            statement.setInt(4, bd.getSecurityCode());
-            statement.setInt(5, CurrentUserManager.getCurrentUser().getUserID());
+            statement.setString(4, hashedSecCode);
+            statement.setString(5, hashedExpDate);
+            statement.setInt(6, CurrentUserManager.getCurrentUser().getUserID());
             statement.executeUpdate(sqlQuery);
             statement.close();
         } catch (Exception e) {
@@ -162,12 +169,18 @@ public class DbUpdateOperations {
             String updateQuery = "INSERT INTO BankDetails (userID, cardName, cardNumber, expiryDate, holderName, " +
                     "securityCode) Values(?,?,?,?,?,?)";
             PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+
+            // Ensure card details are hashed before inserting them
+            String hashedCardNumber = HashedPasswordGenerator.hashPassword(bd.getCardNumber().toCharArray());
+            String hashedExpDate = HashedPasswordGenerator.hashPassword(bd.getExpiryDate().toCharArray());
+            String hashedSecCode = HashedPasswordGenerator.hashPassword(bd.getSecurityCode().toCharArray());
+
             updateStatement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
             updateStatement.setString(2, bd.getCardName());
-            updateStatement.setString(3, bd.getCardNumber());
-            updateStatement.setString(4, bd.getExpiryDate());
+            updateStatement.setString(3, hashedCardNumber);
+            updateStatement.setString(4, hashedExpDate);
             updateStatement.setString(5, bd.getHolderName());
-            updateStatement.setInt(6, bd.getSecurityCode());
+            updateStatement.setString(6, hashedSecCode);
             updateStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

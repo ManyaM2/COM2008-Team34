@@ -250,7 +250,7 @@ public class DefaultView extends JFrame {
                 layout.setHgap(5);
                 layout.setVgap(0);
                 productPanel.setLayout(layout);
-                //Edit details
+                productPanel.add(editProfile(connection));
                 revalidate();
                 repaint();
             }
@@ -571,7 +571,7 @@ public class DefaultView extends JFrame {
                     Integer.parseInt(cNum.substring(0,7));
                     Integer.parseInt(cNum.substring(8));
                     Integer.parseInt(secCode);
-                    BankDetails bd = new BankDetails(cName, cNum, expiryDate, cHolderName, Integer.parseInt(secCode));
+                    BankDetails bd = new BankDetails(cName, cNum, expiryDate, cHolderName, secCode);
                     try {
                         dbUpdateOps.addBankingDetails(connection, bd);
                         o.setStatus(OrderStatus.CONFIRMED);
@@ -588,6 +588,35 @@ public class DefaultView extends JFrame {
                         "Invalid Entry", 0);
             }
         } else { }
+    }
+
+    private JPanel editProfile(Connection connection) {
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        User currentUser = CurrentUserManager.getCurrentUser();
+
+        // Set up comboboxes for the expiry date
+        String[] months = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
+        JComboBox<String> expiryMonth = new JComboBox<>(months);
+        int currentYear = Year.now().getValue();
+        Integer[] expiryYears = new Integer[8];
+        for(int i = currentYear; i < currentYear + 8;i++)
+            expiryYears[i - (currentYear)] = i % 1000;
+        JComboBox<Integer> expiryYear = new JComboBox<>(expiryYears);
+
+        //Add fields and labels to the form
+        JTextField forename = new JTextField(currentUser.getUserForename());
+        JTextField surname = new JTextField(currentUser.getUserSurname());
+        JTextField email = new JTextField(currentUser.getUserEmail());
+        JTextField securityCode = new JTextField("");
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Forename "));
+        panel.add(forename);
+        panel.add(new JLabel("Surname "));
+        panel.add(surname);
+        panel.add(new JLabel("Email "));
+        panel.add(email);
+
+        return panel;
     }
 }
 

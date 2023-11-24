@@ -4,7 +4,7 @@ public class BankDetails {
     private String cardNumber;
     private String expiryDate;
     private String holderName;
-    private int securityCode;
+    private String securityCode;
 
     public String getCardName() {
         return cardName;
@@ -22,11 +22,11 @@ public class BankDetails {
         return holderName;
     }
 
-    public int getSecurityCode() {
+    public String getSecurityCode() {
         return securityCode;
     }
 
-    public BankDetails (String cName, String cNumber, String date, String hName, int code) {
+    public BankDetails (String cName, String cNumber, String date, String hName, String code) {
         this.cardName = cName;
         this.cardNumber = cNumber;
         this.expiryDate = date;

@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,9 +133,12 @@ public class DatabaseOperations {
                 int orderNumber = resultSet.getInt(1);
                 int userID = resultSet.getInt(2);
                 OrderStatus orderStatus = OrderStatus.valueOf(resultSet.getString(3));
-                String orderDate = resultSet.getString(4);
+                String orderDateString = resultSet.getString(4);
+                LocalDate orderDate = LocalDate.of(Integer.parseInt(orderDateString.substring(0,4)),
+                        Integer.parseInt(orderDateString.substring(5,7)),
+                        Integer.parseInt(orderDateString.substring(8,10)));
                 List<OrderLine> orderlines = getOrderline(connection, orderNumber);
-                orders.add(new Order(orderNumber, userID, orderStatus, orderlines));
+                orders.add(new Order(orderNumber, userID, orderStatus, orderlines, orderDate));
             }
             resultSet.close();
             statement.close();
@@ -159,8 +163,12 @@ public class DatabaseOperations {
             while (resultSet.next()) {
                 int orderNumber = resultSet.getInt("orderNumber");
                 OrderStatus orderStatus = OrderStatus.valueOf(resultSet.getString("orderStatus").toUpperCase());
+                String orderDateString = resultSet.getString("orderDate");
+                LocalDate orderDate = LocalDate.of(Integer.parseInt(orderDateString.substring(0,4)),
+                        Integer.parseInt(orderDateString.substring(5,7)),
+                        Integer.parseInt(orderDateString.substring(8,10)));
                 List<OrderLine> orderlines = getOrderline(connection, orderNumber);
-                orders.add(new Order(orderNumber, user.getUserID(), orderStatus, orderlines));
+                orders.add(new Order(orderNumber, user.getUserID(), orderStatus, orderlines, orderDate));
             }
             resultSet.close();
             statement.close();

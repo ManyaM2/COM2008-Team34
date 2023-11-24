@@ -12,11 +12,12 @@ public class Order {
     private LocalDate dateMade;
 
     // Constructor
-    public Order(Integer orderNumber, Integer userID, OrderStatus status, List<OrderLine> orderLines) {
+    public Order(Integer orderNumber, Integer userID, OrderStatus status, List<OrderLine> orderLines, LocalDate date) {
         this.orderNumber = orderNumber;
         this.userID = userID;
         this.status = status;
         this.orderLines = orderLines;
+        this.dateMade = date;
     }
     
     public Integer getOrderNumber() {
