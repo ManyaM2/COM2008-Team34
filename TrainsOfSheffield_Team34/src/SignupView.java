@@ -10,6 +10,7 @@ import java.util.List;
 public class SignupView extends JFrame {
 
     private JFrame frame;
+    private Address userAddress;
 
     private JLabel forenameLabel;
     private JTextField forenameField;
@@ -22,7 +23,7 @@ public class SignupView extends JFrame {
     private JButton signupButton;
     private JButton clearButton;
     private JButton backButton;
-    private Address userAddress;
+
 
     public SignupView(Connection connection) throws HeadlessException {
 

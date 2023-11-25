@@ -69,7 +69,8 @@ public class LoginView extends JFrame {
                     Arrays.fill(passwordChars, '\u0000');
 
                     //Show a successful login message
-                    JOptionPane.showMessageDialog(LoginView.this, "Welcome user " + username, "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(LoginView.this, "Welcome user " + username,
+                            "Login Successful", JOptionPane.INFORMATION_MESSAGE);
 
                     // Close the current window
                     dispose();
