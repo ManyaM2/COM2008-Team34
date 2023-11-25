@@ -1,3 +1,5 @@
+import java.sql.Connection;
+
 public class BankDetails {
 
     private String cardName;
@@ -24,6 +26,15 @@ public class BankDetails {
 
     public String getSecurityCode() {
         return securityCode;
+    }
+
+    public void addToDatabase(Connection connection) {
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        try {
+            dbUpdateOps.addBankingDetails(connection, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public BankDetails (String cName, String cNumber, String date, String hName, String code) {

@@ -1,11 +1,11 @@
 public class Address {
 
-    private Integer houseNumber;
+    private String houseNumber;
     private String roadName;
     private String cityName;
     private String postcode;
 
-    public Integer getHouseNumber() {
+    public String getHouseNumber() {
         return houseNumber;
     }
 
@@ -21,7 +21,11 @@ public class Address {
         return postcode;
     }
 
-    public Address(Integer house, String road, String city, String post) {
+    public String toString(){
+        return " " + houseNumber + " " + roadName + "\n " + cityName + "\n " + postcode;
+    }
+
+    public Address(String house, String road, String city, String post) {
         this.houseNumber = house;
         this.roadName = road;
         this.cityName = city;

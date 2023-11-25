@@ -1,3 +1,5 @@
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.time.LocalDate;
 
@@ -38,16 +40,29 @@ public class Order {
 
     public LocalDate getDateMade(){ return dateMade; }
 
-    public void setStatus(OrderStatus s){ status = s; }
+    /**
+     * Set the status of the order instance and the order in the database to s
+     * @param connection
+     * @param s The new status of the order
+     */
+    public void setStatus(Connection connection, OrderStatus s){
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        status = s;
+        try {
+            dbUpdateOps.updateOrderStatus(connection, this);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     
     public void saveDate() {
         dateMade = LocalDate.now();
     }
     
-    public float totalCost(List<OrderLine> lines) {
+    public double totalCost(Connection connection) {
         float total = 0.0f;
-        for (OrderLine line : lines) {
-            total += line.lineCost(quantity,price);
+        for (OrderLine line : orderLines) {
+            total += line.lineCost(connection);
         }
         return total;
     }

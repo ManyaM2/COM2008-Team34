@@ -1,3 +1,5 @@
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class User {
@@ -25,6 +27,73 @@ public class User {
 
     public String getUserSurname() {
         return userSurname;
+    }
+
+    public Address getAddress(Connection connection){
+        DatabaseOperations dbOps = new DatabaseOperations();
+        try {
+            return dbOps.getAddress(connection, userID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void setUserForename(String fn){ userForename = fn; }
+    public void setUserSurname(String sn){ userSurname = sn; }
+    public void setUserEmail(String e){ userEmail = e; }
+
+    /**
+     * Set haveConfirmed = true for the current user
+     * @param connection
+     */
+    public void setConfirmed(Connection connection){
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        try {
+            dbUpdateOps.setConfirmed(connection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the address of the user locally and on the database
+     * @param connection
+     * @param address
+     */
+    public void updateAddress(Connection connection, Address address){
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        try {
+            dbUpdateOps.updateAddress(connection, address, this);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the user's forename and surname
+     * @param connection
+     */
+    public void updatePersonalDetails(Connection connection){
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        try {
+            dbUpdateOps.updatePersonalDetails(connection,this);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the user's email
+     * @param connection
+     */
+    public void updateEmail(Connection connection){
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        try {
+            dbUpdateOps.updateEmail(connection,this);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public User (String forename, String surname, int id, String email, List<String> roles) {

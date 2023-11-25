@@ -9,7 +9,7 @@ public class Main {
         List<String> testRoles = new ArrayList<>();
         testRoles.add("customer");
         testRoles.add("staff");
-        User testUser = new User("Yoongi", "Min", 2, "agustd@bts.com", testRoles);
+        User testUser = new User("Jung", "Hoseok", 2, "hobi@bts.com", testRoles);
         DatabaseConnectionHandler databaseConnectionHandler = new DatabaseConnectionHandler();
         CurrentUserManager.setCurrentUser(testUser);
 

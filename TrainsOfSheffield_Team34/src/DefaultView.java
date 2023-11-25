@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.Year;
+import java.util.Collections;
 import java.util.List;
 
 public class DefaultView extends JFrame {
@@ -246,10 +247,7 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Profile - Edit Details");
                 productPanel.removeAll();
-                GridLayout layout = new GridLayout(0,3);
-                layout.setHgap(5);
-                layout.setVgap(0);
-                productPanel.setLayout(layout);
+                productPanel.setLayout(new BoxLayout(productPanel, BoxLayout.Y_AXIS));
                 productPanel.add(editProfile(connection));
                 revalidate();
                 repaint();
@@ -354,6 +352,7 @@ public class DefaultView extends JFrame {
     public JPanel getOrderPanel(Order o, Connection connection){
         DatabaseOperations dbOps = new DatabaseOperations();
         DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        User currentUser = CurrentUserManager.getCurrentUser();
 
         // Set the layout and border of the order section
         JPanel orderPanel = new JPanel();
@@ -362,18 +361,26 @@ public class DefaultView extends JFrame {
         layout.setVgap(0);
         orderPanel.setLayout(layout);
         TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
-                ("Order " + o.getOrderNumber() + " | Status: " + o.getStatus()) + " | " + o.getDateMade());
+                ("Order " + o.getOrderNumber()));
         title.setTitleJustification(TitledBorder.LEFT);
         orderPanel.setBorder(title);
 
-        // Add the products to the order section
-        for (OrderLine ol : o.getOrderLines()){
-            orderPanel.add(getOrderLine(connection, ol, o));
-        }
+        // Display order metadata
+        JPanel metadataPanel = new JPanel();
+        metadataPanel.setLayout(new BoxLayout(metadataPanel, BoxLayout.Y_AXIS));
+        JTextArea orderMetadataDisplay = new JTextArea(10, 20);
+        orderMetadataDisplay.setMaximumSize(new Dimension(250, 80));
+        orderMetadataDisplay.setMinimumSize(new Dimension(200, 80));
+        orderMetadataDisplay.setText(" Status: " + o.getStatus() + " | Date: " + o.getDateMade() + "\n " +
+                currentUser.getUserForename() + " " + currentUser.getUserSurname() + "\n " +
+                currentUser.getUserEmail() + "\n\n " + currentUser.getAddress(connection).toString() +
+                "\n\n Total cost: £" + moneyFormat.format(o.totalCost(connection)));
+        orderMetadataDisplay.setEditable(false);
+        metadataPanel.add(orderMetadataDisplay);
 
+        JPanel buttonPanel = new JPanel();
         // Add a button to confirm the order
         if (o.getStatus() == OrderStatus.PENDING){
-            JPanel buttonPanel = new JPanel();
             JButton confirmButton = new JButton("Confirm order");
             confirmButton.setMaximumSize(new Dimension(100,30));
             confirmButton.addActionListener(new ActionListener() {
@@ -382,10 +389,9 @@ public class DefaultView extends JFrame {
 
                     try {
                         if (!dbOps.checkIfConfirmed(connection))
-                            addBankDetails(connection, o);
+                            addBankDetails(connection, o, true);
                         else {
-                            o.setStatus(OrderStatus.CONFIRMED);
-                            dbUpdateOps.updateOrderStatus(connection, o);
+                            o.setStatus(connection, OrderStatus.CONFIRMED);
                             JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
                         }
                     } catch (Exception ex) {
@@ -396,30 +402,26 @@ public class DefaultView extends JFrame {
             });
 
             buttonPanel.add(confirmButton);
-            orderPanel.add(buttonPanel);
         }
+        metadataPanel.add(buttonPanel);
+        metadataPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        orderPanel.add(metadataPanel);
+
+        // Add the products to the order section
+        for (int i = 0; i < o.getOrderLines().size(); i++)
+            orderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
 
         return orderPanel;
     }
 
-    public JPanel getOrderLine(Connection connection, OrderLine ol, Order o){
+    public JPanel getOrderLine(Connection connection, OrderLine ol, Order o, int counter){
         DatabaseOperations dbOps = new DatabaseOperations();
         DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
         JPanel orderLineSection = new JPanel();
         JPanel buttonPanel = new JPanel();
-        String pCode = ol.getProductCode();
 
         //Get the product represented in the orderLine
-        Product lineProduct = null;
-        try {
-            List<Product> products = dbOps.getProducts(connection);
-            for (Product p : products){
-                if (p.getProductCode().equals(pCode) && p != null)
-                    lineProduct = p;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        Product lineProduct = ol.getProduct(connection);
 
         //Make a button to remove the orderline from the order
         JButton removeOrderLineButton = new JButton("Remove");
@@ -463,10 +465,9 @@ public class DefaultView extends JFrame {
         orderlineDisplay.setMaximumSize(new Dimension(250, 80));
         orderlineDisplay.setMinimumSize(new Dimension(200, 80));
         if (lineProduct != null){
-            float lineCost = ol.lineCost(ol.getProductQuantity(), (float)lineProduct.getRetailPrice());
             orderlineDisplay.setText(String.format("\n " + ol.getProductCode() + " | " + lineProduct.getProductName() +
                     "\n " + lineProduct.getBrandName() + "\n Product Quantity: " + ol.getProductQuantity() +
-                    "\n Line cost: £" + moneyFormat.format(lineCost)));
+                    "\n Line cost: £" + moneyFormat.format(ol.lineCost(connection))));
         }
         orderlineDisplay.setEditable(false);
 
@@ -478,7 +479,7 @@ public class DefaultView extends JFrame {
         orderLineSection.add(orderlineDisplay);
         orderLineSection.add(buttonPanel);
         TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
-                ("Orderline " + ol.getLineNumber()));
+                ("Orderline " + counter));
         title.setTitleJustification(TitledBorder.LEFT);
         orderLineSection.setBorder(title);
         return orderLineSection;
@@ -503,6 +504,7 @@ public class DefaultView extends JFrame {
             // Display confirmed orders
             orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
             orders.removeIf(n -> (n.getStatus() != OrderStatus.CONFIRMED));
+            Collections.reverse(orders); //Newest order displayed first
             for (Order o : orders){
                 productPanel.add(getOrderPanel(o, connection));
             }
@@ -510,6 +512,7 @@ public class DefaultView extends JFrame {
             // Display fulfilled orders
             orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
             orders.removeIf(n -> (n.getStatus() != OrderStatus.FULFILLED));
+            Collections.reverse(orders);
             for (Order o : orders){
                 productPanel.add(getOrderPanel(o, connection));
             }
@@ -520,8 +523,8 @@ public class DefaultView extends JFrame {
         repaint();
     }
 
-    private void addBankDetails(Connection connection, Order o) {
-        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+    private void addBankDetails(Connection connection, Order o, Boolean confirmingOrder) {
+        User currentUser = CurrentUserManager.getCurrentUser();
 
         // Set up comboboxes for the expiry date
         String[] months = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
@@ -563,7 +566,7 @@ public class DefaultView extends JFrame {
 
                 // Ensure the details entered are of the correct length
                 if (cNum.length() != 16 || secCode.length() != 3 || cName.isEmpty() || cHolderName.isEmpty()){
-                    JOptionPane.showMessageDialog(panel,"Confirmation failed: Invalid details provided ",
+                    JOptionPane.showMessageDialog(panel,"Invalid details provided ",
                             "Invalid Entry", 0);
                 }
                 else{
@@ -572,49 +575,137 @@ public class DefaultView extends JFrame {
                     Integer.parseInt(cNum.substring(8));
                     Integer.parseInt(secCode);
                     BankDetails bd = new BankDetails(cName, cNum, expiryDate, cHolderName, secCode);
-                    try {
-                        dbUpdateOps.addBankingDetails(connection, bd);
-                        o.setStatus(OrderStatus.CONFIRMED);
-                        dbUpdateOps.updateOrderStatus(connection, o);
-                        dbUpdateOps.setConfirmed(connection);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    bd.addToDatabase(connection);
+                    if (confirmingOrder){
+                        o.setStatus(connection, OrderStatus.CONFIRMED);
+                        currentUser.setConfirmed(connection);
                     }
-                    JOptionPane.showMessageDialog(panel, "Order confirmed");
+                    if (confirmingOrder)
+                        JOptionPane.showMessageDialog(panel, "Order confirmed");
+                    else
+                        JOptionPane.showMessageDialog(panel, "Details updated");
                 }
             }
             catch (NumberFormatException e) {  // Ensure card number and security code are integer entries
-                JOptionPane.showMessageDialog(panel, "Confirmation failed: Invalid details provided",
+                JOptionPane.showMessageDialog(panel, "Invalid details provided",
                         "Invalid Entry", 0);
             }
         } else { }
     }
 
+    private void editAddress(Connection connection) {
+        //Add fields and labels to the form
+        JTextField houseNumberField = new JTextField("");
+        JTextField postcodeField = new JTextField("");
+        JTextField roadNameField = new JTextField("");
+        JTextField cityNameField = new JTextField("");
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("House number: "));
+        panel.add(houseNumberField);
+        panel.add(new JLabel("Postcode: "));
+        panel.add(postcodeField);
+        panel.add(new JLabel("Road name: "));
+        panel.add(roadNameField);
+        panel.add(new JLabel("City name: "));
+        panel.add(cityNameField);
+
+        // Process results
+        int result = JOptionPane.showConfirmDialog(null, panel, "Edit address",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            // Ensure all the fields have been filled
+            if (houseNumberField.getText().isBlank() || postcodeField.getText().isBlank() ||
+                    roadNameField.getText().isBlank() || cityNameField.getText().isBlank()){
+                JOptionPane.showMessageDialog(panel,"Update failed: Please fill in all the fields ",
+                        "Invalid Entry", 0);
+            } else {
+                Address newAddress = new Address(houseNumberField.getText(), roadNameField.getText(),
+                        cityNameField.getText(), postcodeField.getText());
+                // Update address in database
+                CurrentUserManager.getCurrentUser().updateAddress(connection, newAddress);
+                JOptionPane.showMessageDialog(panel, "Address updated");
+            }
+        }
+    }
+
     private JPanel editProfile(Connection connection) {
-        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
         User currentUser = CurrentUserManager.getCurrentUser();
 
-        // Set up comboboxes for the expiry date
-        String[] months = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
-        JComboBox<String> expiryMonth = new JComboBox<>(months);
-        int currentYear = Year.now().getValue();
-        Integer[] expiryYears = new Integer[8];
-        for(int i = currentYear; i < currentYear + 8;i++)
-            expiryYears[i - (currentYear)] = i % 1000;
-        JComboBox<Integer> expiryYear = new JComboBox<>(expiryYears);
+        // Instantiate components
+        JTextField forenameField = new JTextField(currentUser.getUserForename());
+        JTextField surnameField = new JTextField(currentUser.getUserSurname());
+        JTextField emailField = new JTextField(currentUser.getUserEmail());
+        forenameField.setColumns(10);
+        surnameField.setColumns(10);
+        emailField.setColumns(20);
+        JButton editAddressButton = new JButton("Edit address");
+        JButton editBankDetailsButton = new JButton("Edit bank details");
+        JButton applyButton = new JButton("Apply changes");
+        JPanel textFields = new JPanel(new FlowLayout());
+        textFields.add(new JLabel("Forename: "));
+        textFields.add(forenameField);
+        textFields.add(new JLabel("Surname: "));
+        textFields.add(surnameField);
+        textFields.add(new JLabel("Email: "));
+        textFields.add(emailField);
 
-        //Add fields and labels to the form
-        JTextField forename = new JTextField(currentUser.getUserForename());
-        JTextField surname = new JTextField(currentUser.getUserSurname());
-        JTextField email = new JTextField(currentUser.getUserEmail());
-        JTextField securityCode = new JTextField("");
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Forename "));
-        panel.add(forename);
-        panel.add(new JLabel("Surname "));
-        panel.add(surname);
-        panel.add(new JLabel("Email "));
-        panel.add(email);
+        // Add components to the panels
+        JPanel editButtons = new JPanel(new FlowLayout());
+        JPanel applyButtonPanel = new JPanel();
+        JPanel panel = new JPanel();
+        editButtons.add(editAddressButton);
+        editButtons.add(editBankDetailsButton);
+        applyButtonPanel.add(applyButton);
+        panel.add(textFields);
+        panel.add(editButtons);
+        panel.add(applyButtonPanel);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        // Add action listeners
+        editBankDetailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addBankDetails(connection, null, false);
+            }
+        });
+        editAddressButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                editAddress(connection);
+            }
+        });
+        applyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String forename = forenameField.getText();
+                String surname = surnameField.getText();
+                String email = emailField.getText();
+                // Ensure there is text in all the fields
+                if (forename.isBlank() || surname.isBlank() || email.isBlank()) {
+                    JOptionPane.showMessageDialog(panel, "Update failed: Please fill in all the fields ",
+                            "Invalid Entry", 0);
+                } else {
+                    // Ensure the email contains the correct characters
+                    if (!email.contains("@") || !email.contains(".")){
+                        JOptionPane.showMessageDialog(panel, "Update failed: Invalid email address",
+                                "Invalid Entry", 0);
+                    } else { // Apply changes
+                        currentUser.setUserForename(forename);
+                        currentUser.setUserSurname(surname);
+                        currentUser.setUserEmail(email);
+
+                        // Update user details in the database
+                        currentUser.updatePersonalDetails(connection);
+                        currentUser.updateEmail(connection);
+
+                        // Update user details in the session
+                        CurrentUserManager.setCurrentUser(currentUser);
+
+                        JOptionPane.showMessageDialog(panel, "Details updated");
+                    }
+                }
+            }
+        });
 
         return panel;
     }

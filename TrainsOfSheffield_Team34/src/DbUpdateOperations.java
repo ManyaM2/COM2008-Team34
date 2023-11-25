@@ -6,30 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class DbUpdateOperations {
-    public void updateBankDetails(Connection connection, BankDetails bd) throws SQLException {
-        try {
-            String sqlQuery = "UPDATE BankDetails " +
-                    "SET cardName = ?, cardNumber = ?, holderName = ?, securityCode = ?, expiryDate = ? " +
-                    "WHERE userID = ?";
-            PreparedStatement statement = connection.prepareStatement(sqlQuery);
-
-            // Ensure the bank details are hashed before they are added to the database
-            String hashedCardNumber = HashedPasswordGenerator.hashPassword(bd.getCardNumber().toCharArray());
-            String hashedExpDate = HashedPasswordGenerator.hashPassword(bd.getExpiryDate().toCharArray());
-            String hashedSecCode = HashedPasswordGenerator.hashPassword(bd.getSecurityCode().toCharArray());
-
-            statement.setString(1, bd.getCardName());
-            statement.setString(2, hashedCardNumber);
-            statement.setString(3, bd.getHolderName());
-            statement.setString(4, hashedSecCode);
-            statement.setString(5, hashedExpDate);
-            statement.setInt(6, CurrentUserManager.getCurrentUser().getUserID());
-            statement.executeUpdate(sqlQuery);
-            statement.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Update the stock level of a product in the database and locally
@@ -163,9 +139,30 @@ public class DbUpdateOperations {
         }
     }
 
+    /**
+     * Adds a user's bank details to the database, if they already have details stored,
+     * the previous details are deleted
+     * @param connection
+     * @param bd The bank details
+     * @throws SQLException
+     */
     public void addBankingDetails(Connection connection, BankDetails bd) throws SQLException {
         ResultSet resultSet = null;
         try{
+            // Delete a users bank details if they already exist
+            String sqlQuery = "SELECT userID FROM BankDetails WHERE userID = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
+            resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String deleteQuery = "DELETE FROM BankDetails WHERE userID = ?";
+                PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
+                deleteStatement.setInt(1, CurrentUserManager.getCurrentUser().getUserID());
+                deleteStatement.executeUpdate();
+            }
+
+            // Insert new details
             String updateQuery = "INSERT INTO BankDetails (userID, cardName, cardNumber, expiryDate, holderName, " +
                     "securityCode) Values(?,?,?,?,?,?)";
             PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
@@ -182,6 +179,81 @@ public class DbUpdateOperations {
             updateStatement.setString(5, bd.getHolderName());
             updateStatement.setString(6, hashedSecCode);
             updateStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the address of a user
+     * @param connection
+     * @param address The updated address
+     * @throws SQLException
+     */
+    public void updateAddress(Connection connection, Address address, User user) throws SQLException {
+        try{
+            // Try to get the address from the database
+            String addressQuery = "SELECT houseNumber FROM Addresses WHERE houseNumber = ? AND postcode = ?";
+            PreparedStatement addressStatement = connection.prepareStatement(addressQuery);
+            addressStatement.setString(1, address.getHouseNumber());
+            addressStatement.setString(2, address.getPostCode());
+            ResultSet resultSet = addressStatement.executeQuery();
+
+            // If the address doesn't exist, add it to the database
+            if (!resultSet.next()) {
+                addressQuery = "INSERT INTO Addresses VALUES (?,?,?,?)";
+                addressStatement = connection.prepareStatement(addressQuery);
+                addressStatement.setString(1, address.getHouseNumber());
+                addressStatement.setString(2, address.getPostCode());
+                addressStatement.setString(3, address.getRoadName());
+                addressStatement.setString(4, address.getCityName());
+                addressStatement.executeUpdate();
+            }
+
+            // Update the user's address
+            String userQuery = "UPDATE Users SET postCode = ?, houseNumber = ? WHERE userID = ?";
+            PreparedStatement userStatement = connection.prepareStatement(userQuery);
+            userStatement.setString(1, address.getPostCode());
+            userStatement.setString(2, address.getHouseNumber());
+            userStatement.setInt(3, user.getUserID());
+            userStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update a user's forename and surname
+     * @param connection
+     * @param user
+     * @throws SQLException
+     */
+    public void updatePersonalDetails(Connection connection, User user) throws SQLException {
+        try{
+            String userQuery = "UPDATE Users SET forename = ?, surname = ? WHERE userID = ?";
+            PreparedStatement userStatement = connection.prepareStatement(userQuery);
+            userStatement.setString(1, user.getUserForename());
+            userStatement.setString(2, user.getUserSurname());
+            userStatement.setInt(3, user.getUserID());
+            userStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update a user's email
+     * @param connection
+     * @param user
+     * @throws SQLException
+     */
+    public void updateEmail(Connection connection, User user) throws SQLException {
+        try{
+            String userQuery = "UPDATE Users SET email = ? WHERE userID = ?";
+            PreparedStatement userStatement = connection.prepareStatement(userQuery);
+            userStatement.setString(1, user.getUserEmail());
+            userStatement.setInt(2, user.getUserID());
+            userStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }

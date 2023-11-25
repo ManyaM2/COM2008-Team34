@@ -26,11 +26,11 @@ public class DatabaseOperations {
                     "AND u.userID = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setInt(1, id);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
 
             // Save the query results as an address
             if (resultSet.next()) {
-                int houseNumber = resultSet.getInt(2);
+                String houseNumber = resultSet.getString(2);
                 String postcode = resultSet.getString(3);
                 String roadName = resultSet.getString(4);
                 String cityName = resultSet.getString(5);
@@ -44,7 +44,6 @@ public class DatabaseOperations {
         }
         return address;
     }
-
 
 
     /**
