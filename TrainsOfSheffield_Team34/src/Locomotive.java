@@ -4,9 +4,9 @@ public class Locomotive extends Product{
 
     public String getEraCode(){ return eraCode; }
     public String getDccCode(){ return dccCode; }
-    public Locomotive(String pCode, String bName, String gauge, String pName, double rPrice, int sLevel,
+    public Locomotive(String pCode, String bName, String gauge, String pName, double rPrice, int sLevel, String psCode,
                       String era, String dcc) {
-        super(pCode, bName, gauge, pName, rPrice, sLevel);
+        super(pCode, bName, pName, rPrice, gauge, sLevel, psCode);
         this.eraCode = era;
         this.dccCode = dcc;
     }

@@ -11,14 +11,13 @@ public class Set extends Product{
     public int getSetID(){return setID;}
     public String getControllerType(){return controllerType;}
     public List<Product> getProductCodes(){ return productCodes; }
-    public Set(int setID, String bName, String gauge, String pName, double rPrice, int sLevel, List<Product> products,
+    public Set(int setID, String bName, String gauge, String pName, double rPrice, int sLevel, String psCode, List<Product> products,
                String controllerType, String pCode) {
-        super(pCode, bName, gauge, pName, rPrice, sLevel);
+        super(pCode, bName, pName, rPrice, gauge, sLevel, psCode);
         this.setID = setID;
         this.productCodes = products;
         this.controllerType = controllerType;
     }
-
     /**
      * Gets the era code of a set depending on the era of it's contained locomotive(s)
      * @return "null" if it is a track pack, the era as a String otherwise

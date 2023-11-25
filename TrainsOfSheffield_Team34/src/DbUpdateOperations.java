@@ -320,4 +320,78 @@ public class DbUpdateOperations {
         }
         return resultSet;
     }
+
+
+    public void editProductDetails(Connection connection, Product product) throws SQLException{
+        try{
+            String sqlQuery = "UPDATE Products " +
+                    "SET brandName = ?, productName = ?, retailPrice = ?, gauge = ?, stockLevel = ?, partOfSetCode = ? "
+                    + "WHERE productCode = ?";
+            PreparedStatement statement =  connection.prepareStatement(sqlQuery);
+            statement.setString(1, product.getProductCode());
+            statement.setString(2, product.getBrandName());
+            statement.setString(3, product.getProductName());
+            statement.setDouble(4, product.getRetailPrice());
+            statement.setString(5, product.getGauge());
+            statement.setInt(6, product.getStockLevel());
+            statement.setString(7, product.getPartOfSetCode());
+            statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addProduct(Connection connection, Product product) throws SQLException{
+        try{
+            String sqlQuery = "INSERT INTO Products (productCode, brandName, productName, " +
+                    "retailPrice, gauge, stockLevel, partOfSetCode) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setString(1, product.getProductCode());
+            statement.setString(2, product.getBrandName());
+            statement.setString(3, product.getProductName());
+            statement.setDouble(4, product.getRetailPrice());
+            statement.setString(5, product.getGauge());
+            statement.setInt(6, product.getStockLevel());
+            statement.setString(7, product.getPartOfSetCode());
+            statement.executeUpdate();
+
+            if (product.getPartOfSetCode() != null){
+                String newQuery = "INSERT INTO ProductsInSet (productCode, setCode, quantity) VALUES (?, ?, ?)";
+                PreparedStatement newStatement = connection.prepareStatement(newQuery);
+                newStatement.setString(1, product.getProductCode());
+                newStatement.setString(2, product.getPartOfSetCode());
+                newStatement.setInt(3, 0);
+                newStatement.executeUpdate();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteProduct(Connection connection, Product product) throws SQLException{
+        try{
+            String setQuery = "DELETE FROM ProductsInSet WHERE productCode = ?";
+            PreparedStatement delStatement = connection.prepareStatement(setQuery);
+            delStatement.setString(1, product.getProductCode());
+            delStatement.executeUpdate();
+
+            String orderLineQuery = "DELETE FROM OrderLine WHERE productCode = ?";
+            PreparedStatement deleteStatement = connection.prepareStatement(orderLineQuery);
+            deleteStatement.setString(1, product.getProductCode());
+            deleteStatement.executeUpdate();
+
+            /*String updateQuery = "UPDATE Products SET PartOfSetCode=NULL WHERE PartOfSetCode = ?";
+            PreparedStatement upStatement = connection.prepareStatement(updateQuery);
+            upStatement.setString(1, product.getProductCode());
+            upStatement.executeUpdate();*/
+
+            String sqlQuery = "DELETE FROM Products WHERE productCode = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setString(1, product.getProductCode());
+            statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

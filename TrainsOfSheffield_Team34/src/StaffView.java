@@ -13,11 +13,14 @@ public class StaffView extends JFrame {
     private JButton managerButton;
     private JButton editButton;
     private JButton deleteButton;
+    private JButton addButton;
+    private JPanel productPanel;
     private JTextArea productDisplay;
     private JTextArea orderDisplay;
 
     public StaffView(Connection connection) throws SQLException {
         DatabaseOperations databaseOperations = new DatabaseOperations();
+        DbUpdateOperations databaseUpdateOps = new DbUpdateOperations();
         this.setTitle("Trains of Sheffield | Home");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -42,34 +45,30 @@ public class StaffView extends JFrame {
         productsMenu.add(trackPiecesItem);
         productsMenu.add(rollingStockItem);
 
+        JMenuItem prevItem = new JMenuItem("<<<");
+        prevItem.setMaximumSize(new Dimension(35, 50));
+
         JMenuItem homeItem = new JMenuItem("Home");
         homeItem.setMaximumSize(new Dimension(45, 50));
-
-        JMenu profileMenu = new JMenu("Profile");
-        JMenuItem editDetailsItem = new JMenuItem("Edit Details");
-        JMenuItem myOrdersItem = new JMenuItem("My Orders");
-
-        profileMenu.add(editDetailsItem);
-        profileMenu.add(myOrdersItem);
 
         JMenuItem detailsItem = new JMenuItem("View Orders");
         detailsItem.setMaximumSize((new Dimension(80,50)));
 
         menu = new JMenuBar();
+        menu.add(prevItem);
         menu.add(homeItem);
         menu.add(productsMenu);
-        menu.add(profileMenu);
         menu.add(detailsItem);
 
         // Display the products
-        JPanel productPanel = new JPanel();
+        productPanel = new JPanel();
         GridLayout layout = new GridLayout(0,3);
-        layout.setHgap(10);
+        layout.setHgap(5);
         layout.setVgap(0);
         productPanel.setLayout(layout);
         List<Product> products = databaseOperations.getProducts(connection);
         for (Product p : products){
-            productPanel.add(getProductSection(p));
+            productPanel.add(getProductSection(p, connection));
         }
         //Encapsulate the product panel in a scrollable panel (to make it scrollable)
         JScrollPane scrollableProducts = new JScrollPane(productPanel);
@@ -79,9 +78,14 @@ public class StaffView extends JFrame {
         managerButton = new JButton("Manager Area");
         belowPanel.add(managerButton);
 
+        JPanel newPanel = new JPanel();
+        addButton = new JButton("+ Add");
+        newPanel.add(addButton);
+
         // Add the components to the frame
         this.setLayout(new BorderLayout());
         this.add(menu, BorderLayout.NORTH);
+        this.add(newPanel, BorderLayout.EAST);
         this.add(belowPanel, BorderLayout.SOUTH);
         this.add(scrollableProducts, BorderLayout.CENTER);
 
@@ -89,16 +93,36 @@ public class StaffView extends JFrame {
             managerButton.setVisible(false);
         this.setVisible(true);
 
+        prevItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Close the current window
+                dispose();
+                // Open a new window
+                DefaultView newWindow = null;
+                try {
+                    newWindow = new DefaultView(connection);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                newWindow.setVisible(true);
+            }
+        });
+
         locomotivesItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Home - Locomotives");
+                setTitle("Trains of Sheffield (Staff) | Home - Locomotives");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Locomotive> products = null;
                 try {
                     products = databaseOperations.getLocomotives(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -111,13 +135,17 @@ public class StaffView extends JFrame {
         trackPacksItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Home - Track Packs");
+                setTitle("Trains of Sheffield (Staff) | Home - Track Packs");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Set> products = null;
                 try {
                     products = databaseOperations.getTrackPacks(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -130,13 +158,17 @@ public class StaffView extends JFrame {
         trainSetsItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Home - Train Sets");
+                setTitle("Trains of Sheffield (Staff) | Home - Train Sets");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Set> products = null;
                 try {
                     products = databaseOperations.getTrainSets(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -149,13 +181,17 @@ public class StaffView extends JFrame {
         controllersItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Home - Controllers");
+                setTitle("Trains of Sheffield (Staff) | Home - Controllers");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Controller> products = null;
                 try {
                     products = databaseOperations.getControllers(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -168,13 +204,17 @@ public class StaffView extends JFrame {
         trackPiecesItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Home - Track Pieces");
+                setTitle("Trains of Sheffield (Staff) | Home - Track Pieces");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Product> products = null;
                 try {
                     products = databaseOperations.getTrackPieces(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -187,13 +227,17 @@ public class StaffView extends JFrame {
         rollingStockItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Home - Rolling Stock");
+                setTitle("Trains of Sheffield (Staff) | Home - Rolling Stock");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<RollingStock> products = null;
                 try {
                     products = databaseOperations.getRollingStock(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -203,38 +247,21 @@ public class StaffView extends JFrame {
             }
         });
 
-        editDetailsItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Profile - Edit Details");
-                productPanel.removeAll();
-                //Edit details
-                revalidate();
-                repaint();
-            }
-        });
-
-        myOrdersItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Profile - My Orders");
-                productPanel.removeAll();
-                //Display + edit orders
-                revalidate();
-                repaint();
-            }
-        });
 
         homeItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Home");
+                setTitle("Trains of Sheffield (Staff) | Home");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Product> products = null;
                 try {
                     products = databaseOperations.getProducts(connection);
                     for (Product p : products){
-                        productPanel.add(getProductSection(p));
+                        productPanel.add(getProductSection(p, connection));
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -247,10 +274,10 @@ public class StaffView extends JFrame {
         detailsItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield | Orders");
+                setTitle("Trains of Sheffield (Staff) | Orders");
                 productPanel.removeAll();
                 GridLayout layout1 = new GridLayout(1,1);
-                layout1.setHgap(10);
+                layout1.setHgap(5);
                 layout1.setVgap(0);
                 productPanel.setLayout(layout1);
                 List<Order> orders = null;
@@ -264,30 +291,59 @@ public class StaffView extends JFrame {
                 }
                 //Encapsulate the product panel in a scrollable panel (to make it scrollable)
                 JScrollPane scrollableOrders = new JScrollPane(productPanel);
-
-                // Add the components to the frame
-                setLayout(new BorderLayout());
-                add(menu, BorderLayout.NORTH);
-                add(belowPanel, BorderLayout.SOUTH);
-                add(scrollableOrders, BorderLayout.CENTER);
                 revalidate();
                 repaint();
             }
         });
 
-        /*editButton.addActionListener(new ActionListener() {
+        addButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                List<Product> products = null;
-                try {
-                    products = databaseOperations.updateProductDetails(connection, product);
-
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+                JTextField productCode = new JTextField("");
+                JTextField brandName = new JTextField("");
+                JTextField productName = new JTextField("");
+                JTextField retailPrice = new JTextField("");
+                JTextField gauge = new JTextField("");
+                JTextField stockLevel = new JTextField("");
+                JTextField partOfSetCode= new JTextField(null);
+                JPanel panel = new JPanel(new GridLayout(0, 1));
+                panel.add(new JLabel("Product Code"));
+                panel.add(productCode);
+                panel.add(new JLabel("Brand Name:"));
+                panel.add(brandName);
+                panel.add(new JLabel("Product Name:"));
+                panel.add(productName);
+                panel.add(new JLabel("Retail Price:"));
+                panel.add(retailPrice);
+                panel.add(new JLabel("Gauge:"));
+                panel.add(gauge);
+                panel.add(new JLabel("Stock Level:"));
+                panel.add(stockLevel);
+                int result = JOptionPane.showConfirmDialog(null, panel, "New Product Details",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (result == JOptionPane.OK_OPTION) {
+                    try {
+                        String pCode = productCode.getText();
+                        String bName = brandName.getText();
+                        String pName = productName.getText();
+                        Double rPrice = Double.valueOf(retailPrice.getText());
+                        String g = gauge.getText();
+                        Integer sLevel = Integer.parseInt(stockLevel.getText());
+                        String psCode = partOfSetCode.getText();
+                        Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel, psCode);
+                        databaseUpdateOps.addProduct(connection, newProduct);
+                        reloadProducts(connection, databaseOperations);
+                    } catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                } else {
+                    reloadProducts(connection, databaseOperations);
                 }
-                revalidate();
-                repaint();
             }
-        });*/
+        });
+
+
+
     }
 
     /**
@@ -295,18 +351,16 @@ public class StaffView extends JFrame {
      * @param p the product being displayed
      * @return The panel displaying the product
      */
-    public JPanel getProductSection(Product p){
+    public JPanel getProductSection(Product p, Connection connection){
+        DatabaseOperations dbOps = new DatabaseOperations();
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
         JPanel productSection = new JPanel();
         JPanel buttonPanel = new JPanel();
-        JButton selectButton = new JButton("Order " + p.getProductCode());
         editButton = new JButton ("Edit");
         deleteButton = new JButton ("Delete");
-        JButton viewContentsButton = new JButton("View " + p.getProductCode() + " Contents");
 
-        GridLayout layout = new GridLayout(2,1);
-        BoxLayout layout2 = new BoxLayout(productSection, BoxLayout.Y_AXIS);
-        productSection.setLayout(layout2);
-
+        BoxLayout layout = new BoxLayout(productSection, BoxLayout.Y_AXIS);
+        productSection.setLayout(layout);
 
         //Display product metadata
         productDisplay = new JTextArea(10, 20);
@@ -327,7 +381,6 @@ public class StaffView extends JFrame {
                         ((Set)p).getControllerType());
             else
                 productDisplay.append("\n " + ((Set)p).getEra());
-            buttonPanel.add(viewContentsButton);
         }
 
         productDisplay.append("\n £" + p.getRetailPrice());
@@ -340,11 +393,93 @@ public class StaffView extends JFrame {
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
 
-        //Add button to order the product
-        buttonPanel.add(selectButton);
         productSection.add(productDisplay);
         productSection.add(buttonPanel);
+
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                List<Product> products = null;
+                JTextField productCode = new JTextField(p.getProductCode());
+                JTextField brandName = new JTextField(p.getBrandName());
+                JTextField productName = new JTextField(p.getProductName());
+                JTextField retailPrice = new JTextField(String.valueOf(p.getRetailPrice()));
+                JTextField gauge = new JTextField(p.getGauge());
+                JTextField stockLevel = new JTextField(String.valueOf(p.getStockLevel()));
+                JTextField partOfSetCode= new JTextField(p.getProductCode());
+                JPanel panel = new JPanel(new GridLayout(0, 1));
+                panel.add(new JLabel("Product Code"));
+                panel.add(productCode);
+                panel.add(new JLabel("Brand Name:"));
+                panel.add(brandName);
+                panel.add(new JLabel("Product Name:"));
+                panel.add(productName);
+                panel.add(new JLabel("Retail Price:"));
+                panel.add(retailPrice);
+                panel.add(new JLabel("Gauge:"));
+                panel.add(gauge);
+                panel.add(new JLabel("Stock Level:"));
+                panel.add(stockLevel);
+                    int result = JOptionPane.showConfirmDialog(null, panel, "Editing details",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (result == JOptionPane.OK_OPTION) {
+                    try {
+                        String pCode = productCode.getText();
+                        String bName = brandName.getText();
+                        String pName = productName.getText();
+                        Double rPrice = Double.valueOf(retailPrice.getText());
+                        String g = gauge.getText();
+                        Integer sLevel = Integer.parseInt(stockLevel.getText());
+                        String psCode = partOfSetCode.getText();
+                        p.setProductCode(pCode);
+                        p.setProductName(pName);
+                        p.setBrandName(bName);
+                        p.setRetailPrice(rPrice);
+                        p.setGauge(g);;
+                        p.setStockLevel(sLevel);
+                        dbUpdateOps.editProductDetails(connection, p);
+                        reloadProducts(connection, dbOps);
+                    } catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                } else {
+                    reloadProducts(connection, dbOps);
+                }
+
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    dbUpdateOps.deleteProduct(connection, p);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                JOptionPane.showMessageDialog(deleteButton, "Product Deleted");
+                reloadProducts(connection, dbOps);
+            }
+        });
+
         return productSection;
+    }
+
+    public void reloadProducts(Connection connection, DatabaseOperations databaseOperations){
+        setTitle("Trains of Sheffield (Staff) | Home");
+        productPanel.removeAll();
+        List<Product> products = null;
+        try {
+            products = databaseOperations.getProducts(connection);
+            products.removeIf(n -> (n.getProductCode().isEmpty()));
+            for (Product p: products) {
+                if (!p.getProductCode().isEmpty())
+                    productPanel.add(getProductSection(p, connection));
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        revalidate();
+        repaint();
     }
 
     public JPanel getOrderSection(Order o){
