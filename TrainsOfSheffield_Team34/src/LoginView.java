@@ -58,8 +58,6 @@ public class LoginView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String username = emailField.getText();
                 char[] passwordChars = passwordField.getPassword();
-                System.out.println(username);
-                System.out.println(new String(passwordChars));
                 DatabaseOperations databaseOperations = new DatabaseOperations();
 
                 // Check if login is successful

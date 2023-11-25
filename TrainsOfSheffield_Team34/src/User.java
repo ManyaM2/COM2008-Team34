@@ -102,4 +102,12 @@ public class User {
         this.userEmail = email;
         this.userRoles = roles;
     }
+
+    public User (String forename, String surname, String email, List<String> roles, int id) {
+        this.userForename = forename;
+        this.userSurname = surname;
+        this.userEmail = email;
+        this.userRoles = roles;
+        this.userID = id;
+    }
 }

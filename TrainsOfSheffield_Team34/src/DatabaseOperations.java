@@ -129,7 +129,7 @@ public class DatabaseOperations {
                 String email = resultSet.getString("email");
                 List<String> roles = getRole(connection, userId);
 
-                user = new User(forename, surname, email, roles);
+                user = new User(forename, surname, email, roles, userId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
