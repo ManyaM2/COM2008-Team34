@@ -96,10 +96,9 @@ public class User {
         }
     }
 
-    public User (String forename, String surname, int id, String email, List<String> roles) {
+    public User (String forename, String surname, String email, List<String> roles) {
         this.userForename = forename;
         this.userSurname = surname;
-        this.userID = id;
         this.userEmail = email;
         this.userRoles = roles;
     }

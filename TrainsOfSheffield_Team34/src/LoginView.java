@@ -8,12 +8,12 @@ import java.util.Arrays;
 
 public class LoginView extends JFrame {
 
-    private JLabel usernameLabel;
+    private JLabel emailLabel;
     private JLabel passwordLabel;
+    private JTextField emailField;
     private JPasswordField passwordField;
-    private JTextField usernameField;
     private JButton loginButton;
-    private JButton cancelButton;
+    private JButton clearButton;
 
     public LoginView(Connection connection) throws HeadlessException {
         this.setTitle("Trains of Sheffield | Login");
@@ -25,44 +25,47 @@ public class LoginView extends JFrame {
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
         // construct components
-        usernameLabel = new JLabel("Email:");
+        emailLabel = new JLabel("Email:");
         passwordLabel = new JLabel("Password:");
+        emailField = new JTextField(15);
         passwordField = new JPasswordField(15);
-        usernameField = new JTextField(15);
         loginButton = new JButton("Login");
-        cancelButton = new JButton("Cancel");
+        clearButton = new JButton("Clear");
 
         // adjust size and set layout
         setPreferredSize(new Dimension(752, 431));
         setLayout(null);
 
         // add components
-        this.add(usernameLabel);
+        this.add(emailLabel);
         this.add(passwordLabel);
+        this.add(emailField);
         this.add(passwordField);
-        this.add(usernameField);
         this.add(loginButton);
-        this.add(cancelButton);
+        this.add(clearButton);
 
         // set component bounds
-        usernameLabel.setBounds(245, 125, 75, 25);
+        emailLabel.setBounds(245, 125, 75, 25);
         passwordLabel.setBounds(220, 165, 75, 25);
+        emailField.setBounds(290, 125, 250, 25);
         passwordField.setBounds(290, 165, 250, 25);
-        usernameField.setBounds(290, 125, 250, 25);
         loginButton.setBounds(330, 205, 80, 30);
-        cancelButton.setBounds(420, 205, 80, 30);
+        clearButton.setBounds(420, 205, 80, 30);
 
         // Create an ActionListener for the login button
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
+                String username = emailField.getText();
                 char[] passwordChars = passwordField.getPassword();
                 System.out.println(username);
                 System.out.println(new String(passwordChars));
                 DatabaseOperations databaseOperations = new DatabaseOperations();
+
                 // Check if login is successful
                 if (databaseOperations.verifyLogin(connection, username, passwordChars)) {
+
+                    CurrentUserManager.setCurrentUser(databaseOperations.getUser(connection, username));
 
                     // Secure disposal of the password
                     Arrays.fill(passwordChars, '\u0000');
@@ -93,16 +96,13 @@ public class LoginView extends JFrame {
                         // Close the current window
                         dispose();
 
-                        /*
                         SignupView signupView = null;
                         try {
                             signupView = new SignupView(connection);
-                        } catch (SQLException ex) {
+                        } catch (Exception ex) {
                             throw new RuntimeException(ex);
                         }
                         signupView.setVisible(true);
-                         */
-
 
                     } else {
                         // Secure disposal of the password
@@ -115,27 +115,16 @@ public class LoginView extends JFrame {
         });
 
         // Create an ActionListener for the cancel button
-        cancelButton.addActionListener(new ActionListener() {
+        clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Clear the text in the username and password fields
-                usernameField.setText("");
+                emailField.setText("");
                 passwordField.setText("");
             }
         });
 
-
         this.setVisible(true);
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                DatabaseConnectionHandler databaseConnectionHandler = new DatabaseConnectionHandler();
-                new LoginView(databaseConnectionHandler.getConnection());
-            }
-        });
-    }
-
 
 }

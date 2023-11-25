@@ -57,13 +57,12 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get the user's roles from the database
-            String sqlQuery = "SELECT u.userID, r.roleName " +
-                    "FROM Users u, Roles r " +
-                    "WHERE u.roleID = r.roleID " +
-                    "AND u.userID = ?";
+            String sqlQuery = "SELECT roleName " +
+                    "FROM Roles " +
+                    "WHERE userID = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setInt(1, id);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
 
             // Add them to the list of strings
             while (resultSet.next()) {
@@ -102,7 +101,7 @@ public class DatabaseOperations {
                 String email = resultSet.getString(4);
                 List<String> roles = getRole(connection, userID);
 
-                users.add(new User(forename, surname, userID, email, roles));
+                users.add(new User(forename, surname, email, roles));
             }
             resultSet.close();
             statement.close();
@@ -110,6 +109,32 @@ public class DatabaseOperations {
             e.printStackTrace();
         }
         return users;
+    }
+
+    public User getUser(Connection connection, String username) {
+        User user = null;
+        try {
+            // Query the database to fetch user information
+            String sql = "SELECT userId, forename, surname, email, password, houseNumber, postCode " +
+                    "FROM Users WHERE email = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String forename = resultSet.getString("forename");
+                String surname = resultSet.getString("surname");
+                int userId = resultSet.getInt("userId");
+                String storedPasswordHash = resultSet.getString("password");
+                String email = resultSet.getString("email");
+                List<String> roles = getRole(connection, userId);
+
+                user = new User(forename, surname, email, roles);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 
     /**

@@ -222,6 +222,52 @@ public class DbUpdateOperations {
         }
     }
 
+    public void addAddress(Connection connection, Address address) throws SQLException {
+        try{
+            // Try to get the address from the database
+            String addressQuery = "SELECT houseNumber FROM Addresses WHERE houseNumber = ? AND postcode = ?";
+            PreparedStatement addressStatement = connection.prepareStatement(addressQuery);
+            addressStatement.setString(1, address.getHouseNumber());
+            addressStatement.setString(2, address.getPostCode());
+            ResultSet resultSet = addressStatement.executeQuery();
+
+            // If the address doesn't exist, add it to the database
+            if (!resultSet.next()) {
+                addressQuery = "INSERT INTO Addresses VALUES (?,?,?,?)";
+                addressStatement = connection.prepareStatement(addressQuery);
+                addressStatement.setString(1, address.getHouseNumber());
+                addressStatement.setString(2, address.getPostCode());
+                addressStatement.setString(3, address.getRoadName());
+                addressStatement.setString(4, address.getCityName());
+                addressStatement.executeUpdate();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addUser(Connection connection, User user, String password, Address address) throws SQLException {
+        try{
+            String updateQuery = "INSERT INTO Users (forename, surname, email, password, houseNumber, postCode, " +
+                    "haveConfirmed) Values(?,?,?,?,?,?,?)";
+            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+
+            // Ensure card details are hashed before inserting them
+            String hashedPassword = HashedPasswordGenerator.hashPassword(password.toCharArray());
+
+            updateStatement.setString(1, user.getUserForename());
+            updateStatement.setString(2, user.getUserSurname());
+            updateStatement.setString(3, user.getUserEmail());
+            updateStatement.setString(4, hashedPassword);
+            updateStatement.setString(5, address.getHouseNumber());
+            updateStatement.setString(6, address.getPostCode());
+            updateStatement.setBoolean(7, false);
+            updateStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Update a user's forename and surname
      * @param connection
