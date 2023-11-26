@@ -349,7 +349,6 @@ public class DbUpdateOperations {
 
     public void editProductDetails(Connection connection, Product product) throws SQLException{
         try{
-            System.out.println(product.getProductName());
             String sqlQuery = "UPDATE Products " +
                     "SET brandName = ?, productName = ?, retailPrice = ?, gauge = ?, stockLevel = ? "
                     + "WHERE productCode = ?";
@@ -365,6 +364,78 @@ public class DbUpdateOperations {
             e.printStackTrace();
         }
     }
+
+    public void editLocomotive(Connection connection, Locomotive locomotive) throws  SQLException{
+        try{
+            editProductDetails(connection, locomotive);
+            String addQuery = "UPDATE Locomotives SET dccCode = ?, eraCode = ? ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, locomotive.getDccCode());
+            statement.setString(2, locomotive.getEraCode());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editController(Connection connection, Controller controller) throws  SQLException{
+        try{
+            editProductDetails(connection, controller);
+            String addQuery = "UPDATE Controller SET typeName = ? ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, controller.getTypeName());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editRollingStcok(Connection connection, RollingStock rollingStock) throws  SQLException{
+        try{
+            editProductDetails(connection, rollingStock);
+            String addQuery = "UPDATE Rolling Stock SET eraCode = ? ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, rollingStock.getEraCode());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editTrainSet(Connection connection, Set trainSet) throws  SQLException{
+        try{
+            editProductDetails(connection, trainSet);
+            String addQuery = "UPDATE Rolling Stock SET eraCode = ?, controllerType = ? ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, trainSet.getEra());
+            statement.setString(2, trainSet.getControllerType());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editToSet(Connection connection, String setCode, Integer quantity) throws  SQLException{
+        try{
+            String sqlQuery = "SELECT productCode FROM Products WHERE productCode = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setString(1, setCode);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                String newQuery = "UPDATE ProductsInSet SET quantity = ?";
+                PreparedStatement newStatement = connection.prepareStatement(newQuery);
+                newStatement.setInt(1, quantity);
+                newStatement.executeUpdate();
+            }
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void addProduct(Connection connection, Product product) throws SQLException{
         try{

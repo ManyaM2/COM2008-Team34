@@ -443,9 +443,7 @@ public class StaffView extends JFrame {
         });
     }
 
-    public void basicLabels(JPanel panel){
 
-    }
 
     /**
      * Add the metadata of each product onto the part of the screen they will be displayed
@@ -469,7 +467,8 @@ public class StaffView extends JFrame {
         productDisplay.setMinimumSize(new Dimension(200, 80));
         productDisplay.setText("\n " + p.getProductCode() + " | " + p.getProductName() + "\n " + p.getBrandName() +
                 "\n " + p.getGauge() + " Gauge (" + p.getScale() + " Scale) \n ");
-        char productType = p.getProductCode().charAt(0);
+
+        // Display different data depending on the type of the product
         if (p instanceof Locomotive)
             productDisplay.append("\n " + ((Locomotive)p).getEraCode() + "\n " + ((Locomotive)p).getDccCode());
         if (p instanceof RollingStock)
@@ -478,12 +477,9 @@ public class StaffView extends JFrame {
             productDisplay.append("\n " + ((Controller)p).getTypeName());
         if (p instanceof Set) {
             if (p.getProductCode().charAt(0) == 'M')
-                productDisplay.append("\n " + ((Set)p).getEra() + "\n Controller Type: " +
-                        ((Set)p).getControllerType());
-            else
-                productDisplay.append("\n " + ((Set)p).getEra());
+                productDisplay.append("\n " + ((Set) p).getEra() + "\n Controller Type: " +
+                        ((Set) p).getControllerType());
         }
-
         productDisplay.append("\n £" + p.getRetailPrice());
         if (p.inStock())
             productDisplay.append("\n In stock");
@@ -499,14 +495,55 @@ public class StaffView extends JFrame {
 
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                List<Product> products = null;
+                String typeProduct = Character.toString(p.getProductCode().charAt(0));
+
                 JTextField productCode = new JTextField(p.getProductCode());
+                productCode.setEnabled(false);
+
                 JTextField brandName = new JTextField(p.getBrandName());
                 JTextField productName = new JTextField(p.getProductName());
                 JTextField retailPrice = new JTextField(String.valueOf(p.getRetailPrice()));
                 JTextField gauge = new JTextField(p.getGauge());
                 JTextField stockLevel = new JTextField(String.valueOf(p.getStockLevel()));
+
+                JTextField setCode = new JTextField();
+                JLabel sc = new JLabel("Add to Set (Optional):");
+
+                JTextField locEraCode = null;
+                if (p instanceof Locomotive) {
+                    locEraCode = new JTextField(((Locomotive)p).getEraCode());
+                }
+                JTextField rolEraCode = null;
+                if (p instanceof RollingStock) {
+                    rolEraCode = new JTextField(((RollingStock)p).getEraCode());
+                }
+                JTextField setEraCode = null;
+                if (p instanceof Set) {
+                    setEraCode = new JTextField(((Set)p).getEra());
+                    setEraCode.setEnabled(false);
+                }
+                JLabel ec = new JLabel("Era Code:");
+
+                JTextField dccCode = null;
+                if (p instanceof Locomotive) {
+                    dccCode = new JTextField(((Locomotive)p).getDccCode());
+                }
+                JLabel dc = new JLabel("Dcc Code:");
+
+                JTextField typeName = new JTextField();
+                JLabel tn = new JLabel("Type Name:") ;
+
+                JTextField controllerType = null;
+                if (p instanceof Set) {
+                    controllerType = new JTextField(((Set)p).getEra());
+                }
+                JLabel ct = new JLabel("Controller Type:");
+
+                JTextField quantity =  new JTextField();
+                JLabel qt = new JLabel("Product Quantity");
+
                 JPanel panel = new JPanel(new GridLayout(0, 1));
+
                 panel.add(new JLabel("Product Code"));
                 panel.add(productCode);
                 panel.add(new JLabel("Brand Name:"));
@@ -519,23 +556,99 @@ public class StaffView extends JFrame {
                 panel.add(gauge);
                 panel.add(new JLabel("Stock Level:"));
                 panel.add(stockLevel);
-                    int result = JOptionPane.showConfirmDialog(null, panel, "Editing details",
+                panel.add(sc);
+                panel.add(setCode);
+
+                switch(typeProduct){
+                    case "L":
+                        panel.add(ec);
+                        panel.add(locEraCode);
+                        panel.add(dc);
+                        panel.add(dccCode);
+                        break;
+                    case "C":
+                        panel.add(tn);
+                        panel.add(typeName);
+                        break;
+                    case "S":
+                        panel.add(ec);
+                        panel.add(rolEraCode);
+                        break;
+                    case "M":
+                        panel.add(ec);
+                        panel.add(setEraCode);
+                        panel.add(ct);
+                        panel.add(controllerType);
+                        break;
+                }
+
+                int result = JOptionPane.showConfirmDialog(null, panel, "Editing details",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                 if (result == JOptionPane.OK_OPTION) {
                     try {
-                        String pCode = productCode.getText();
                         String bName = brandName.getText();
                         String pName = productName.getText();
-                        Double rPrice = Double.valueOf(retailPrice.getText());
+                        double rPrice = Double.parseDouble(retailPrice.getText());
                         String g = gauge.getText();
-                        Integer sLevel = Integer.parseInt(stockLevel.getText());
-                        p.setProductCode(pCode);
+                        int sLevel = Integer.parseInt(stockLevel.getText());
+
                         p.setProductName(pName);
                         p.setBrandName(bName);
                         p.setRetailPrice(rPrice);
-                        p.setGauge(g);;
+                        p.setGauge(g);
                         p.setStockLevel(sLevel);
                         dbUpdateOps.editProductDetails(connection, p);
+
+                        //Considerations for the specific types of products
+                        String sCode = setCode.getText();
+
+                        String leCode = null;
+                        if (locEraCode != null) {
+                            leCode = locEraCode.getText();
+                        }
+                        String reCode = null;
+                        if (rolEraCode != null) {
+                            reCode = rolEraCode.getText();
+                        }
+
+                        String dCode = null;
+                        if (dccCode != null) {
+                            dCode = dccCode.getText();
+                        }
+
+                        String tName = typeName.getText();
+
+                        String cType = null;
+                        if (controllerType != null) {
+                            cType = controllerType.getText();
+                        }
+
+                        //Integer qNumber = Integer.parseInt(quantity.getText());
+
+                        if (p instanceof Locomotive) {
+                            ((Locomotive)p).setEraCode(leCode);
+                            ((Locomotive)p).setDccCode(dCode);
+                            dbUpdateOps.editLocomotive(connection, ((Locomotive)p));
+                        }
+
+                        else if (p instanceof RollingStock){
+                            ((RollingStock)p).setEraCode(reCode);
+                            dbUpdateOps.editRollingStcok(connection, ((RollingStock)p));
+                        }
+                        else if (p instanceof Controller){
+                            ((Controller)p).setTypeName(tName);
+                            dbUpdateOps.editController(connection, ((Controller)p));
+                        }
+                        else if (p instanceof Set){
+                            ((Set)p).setControllerType(cType);
+                            dbUpdateOps.editTrainSet(connection, ((Set)p));
+                        }
+                        else {
+                            dbUpdateOps.editProductDetails(connection, p);
+                        }
+                        /*if (!sCode.isBlank()){
+                            dbUpdateOps.editToSet(connection,sCode, qNumber);
+                        }*/
                         reloadProducts(connection, dbOps);
                     } catch (Exception ex){
                         ex.printStackTrace();
