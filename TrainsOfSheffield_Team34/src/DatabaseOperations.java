@@ -288,7 +288,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT s.setID, s.productCode, s.controllerType, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.partOfSetCode " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Sets s, Products p " +
                     "WHERE p.productCode = s.productCode " +
                     "AND s.productCode LIKE 'M%'";
@@ -305,7 +305,6 @@ public class DatabaseOperations {
                 double retailPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int stockLevel = resultSet.getInt("stockLevel");
-                String partOfSetCode = resultSet.getString("partOfSetCode");
 
                 //Get all the products in the set
                 List<Product> setContents = new ArrayList<>();
@@ -314,7 +313,7 @@ public class DatabaseOperations {
                 setContents.addAll(getRollingStock(connection, productCode));
                 setContents.addAll(getTrackPacks(connection, productCode));
 
-                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, partOfSetCode,setContents,
+                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, setContents,
                         controllerType, productCode));
             }
             resultSet.close();
@@ -330,7 +329,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT s.setID, s.productCode, s.controllerType, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.PartOfSetCode " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Sets s, Products p " +
                     "WHERE p.productCode = s.productCode " +
                     "AND s.productCode LIKE 'P%'";
@@ -347,13 +346,12 @@ public class DatabaseOperations {
                 double retailPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int stockLevel = resultSet.getInt("stockLevel");
-                String partOfSetCode = resultSet.getString("partOfSetCode");
 
                 //Get all the products in the set
                 List<Product> setContents = new ArrayList<>();
                 setContents.addAll(getTrackPieces(connection, productCode));
 
-                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, partOfSetCode, setContents,
+                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, setContents,
                         controllerType, productCode));
             }
             resultSet.close();
@@ -369,11 +367,12 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT s.setID, s.productCode, s.controllerType, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.partOfSetCode " +
-                    "FROM Sets s, Products p " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
+                    "FROM Sets s, Products p, ProductsInSet ps " +
                     "WHERE p.productCode = s.productCode " +
+                    "AND p.productCode = ps.productCode " +
                     "AND s.productCode LIKE 'P%' " +
-                    "AND p.partOfSetCode = ?";
+                    "AND ps.setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
             resultSet = statement.executeQuery(sqlQuery);
@@ -388,13 +387,12 @@ public class DatabaseOperations {
                 double retailPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int stockLevel = resultSet.getInt("stockLevel");
-                String partOfSetCode = resultSet.getString("partOfSetCode");
 
                 //Get all the products in the set
                 List<Product> setContents = new ArrayList<>();
                 setContents.addAll(getTrackPieces(connection, productCode));
 
-                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, partOfSetCode,setContents,
+                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, setContents,
                         controllerType, productCode));
             }
             resultSet.close();
@@ -410,7 +408,7 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the products with a product code starting with 'R'
-            String sqlQuery = "SELECT productCode, brandName, productName, retailPrice, gauge, stockLevel, partOfSetCode " +
+            String sqlQuery = "SELECT productCode, brandName, productName, retailPrice, gauge, stockLevel " +
                     "FROM Products " +
                     "WHERE productCode LIKE 'R%'";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
@@ -424,9 +422,8 @@ public class DatabaseOperations {
                 double retailPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int stockLevel = resultSet.getInt("stockLevel");
-                String partOfSetCode = resultSet.getString("partOfSetCode");
 
-                trackPieces.add(new Product(productCode, brandName, productName, retailPrice, gauge, stockLevel, partOfSetCode));
+                trackPieces.add(new Product(productCode, brandName, productName, retailPrice, gauge, stockLevel));
             }
             resultSet.close();
             statement.close();
@@ -440,8 +437,12 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             // Get all the products with a product code starting with 'R'
-            String sqlQuery = "SELECT productCode, brandName, productName, retailPrice, gauge, stockLevel, partOfSetCode " +
-                    "FROM Products WHERE productCode LIKE 'R%' AND partOfSetCode = ?";
+            String sqlQuery = "SELECT p.productCode, p.brandName, p.productName, p.retailPrice, " +
+                    "p.gauge, p.stockLevel " +
+                    "FROM Products p, ProductsInSet ps " +
+                    "WHERE p.productCode LIKE 'R%' " +
+                    "AND p.productCode = ps.productCode " +
+                    "AND ps.setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
             resultSet = statement.executeQuery();
@@ -455,9 +456,8 @@ public class DatabaseOperations {
                 double retailPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int stockLevel = resultSet.getInt("stockLevel");
-                String partOfSetCode = resultSet.getString("partOfSetCode");
 
-                trackPieces.add(new Product(productCode, brandName, productName, retailPrice, gauge, stockLevel, partOfSetCode));
+                trackPieces.add(new Product(productCode, brandName, productName, retailPrice, gauge, stockLevel));
             }
             resultSet.close();
             statement.close();
@@ -473,7 +473,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT c.productCode, c.typeName, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.partOfSetCode " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Controller c, Products p " +
                     "WHERE p.productCode = c.productCode";
 
@@ -489,9 +489,8 @@ public class DatabaseOperations {
                 double rPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int sLevel = resultSet.getInt("stockLevel");
-                String psCode = resultSet.getString("partOfSetCode");
 
-                controllers.add(new Controller(pCode, bName, gauge, pName, rPrice, sLevel, psCode, typeName));
+                controllers.add(new Controller(pCode, bName, gauge, pName, rPrice, sLevel, typeName));
             }
             resultSet.close();
             statement.close();
@@ -505,11 +504,12 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the products with the same set code
-            String sqlQuery = "SELECT c.productCode, c.typeName, p.partOfSetCode, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.partOfSetCode" +
-                    "FROM Controller c, Products p " +
+            String sqlQuery = "SELECT c.productCode, c.typeName " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
+                    "FROM Controller c, Products p, ProductsInSet ps " +
                     "WHERE p.productCode = c.productCode " +
-                    "AND p.partOfSetCode = ?";
+                    "AND p.productCode = ps.productCode " +
+                    "AND ps.setCode = ?";
 
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
@@ -524,9 +524,8 @@ public class DatabaseOperations {
                 double rPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int sLevel = resultSet.getInt("stockLevel");
-                String psCode = resultSet.getString("partOfSetCode");
 
-                controllers.add(new Controller(pCode, bName, gauge, pName, rPrice, sLevel, psCode, typeName));
+                controllers.add(new Controller(pCode, bName, gauge, pName, rPrice, sLevel, typeName));
             }
             resultSet.close();
             statement.close();
@@ -542,7 +541,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT l.productCode, l.dccCode, l.eraCode, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.partOfSetCode " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Locomotives l, Products p " +
                     "WHERE p.productCode = l.productCode";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
@@ -558,9 +557,8 @@ public class DatabaseOperations {
                 double rPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int sLevel = resultSet.getInt("stockLevel");
-                String psCode = resultSet.getString("partOfSetCode");
 
-                locomotives.add(new Locomotive(pCode, bName, gauge, pName, rPrice, sLevel, psCode, eraCode, dccCode));
+                locomotives.add(new Locomotive(pCode, bName, gauge, pName, rPrice, sLevel, eraCode, dccCode));
             }
             resultSet.close();
             statement.close();
@@ -574,11 +572,12 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get the locomotives with the same set code
-            String sqlQuery = "SELECT l.productCode, l.dccCode, l.eraCode, p.partOfSetCode, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.partOfSetCode" +
-                    "FROM Locomotives l, Products p " +
+            String sqlQuery = "SELECT l.productCode, l.dccCode, l.eraCode, " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
+                    "FROM Locomotives l, ProductsInSet ps, Products p " +
                     "WHERE p.productCode = l.productCode " +
-                    "AND p.partOfSetCode = ?";
+                    "AND p.productCode = ps.productCode " +
+                    "AND ps.setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
             resultSet = statement.executeQuery(sqlQuery);
@@ -593,9 +592,8 @@ public class DatabaseOperations {
                 double rPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int sLevel = resultSet.getInt("stockLevel");
-                String psCode = resultSet.getString("partOfSetCode");
 
-                locomotives.add(new Locomotive(pCode, bName, gauge, pName, rPrice, sLevel, psCode, eraCode, dccCode));
+                locomotives.add(new Locomotive(pCode, bName, gauge, pName, rPrice, sLevel, eraCode, dccCode));
             }
             resultSet.close();
             statement.close();
@@ -611,7 +609,7 @@ public class DatabaseOperations {
         try {
             //Get all the orders from the database
             String sqlQuery = "SELECT rs.productCode, rs.eraCode, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel, p.partOfSetCode " +
+                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM RollingStock rs, Products p " +
                     "WHERE p.productCode = rs.productCode";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
@@ -626,9 +624,8 @@ public class DatabaseOperations {
                 double rPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int sLevel = resultSet.getInt("stockLevel");
-                String psCode = resultSet.getString("partOfSetCode");
 
-                rollingStock.add(new RollingStock(pCode, bName, gauge, pName, rPrice, sLevel, psCode, eraCode));
+                rollingStock.add(new RollingStock(pCode, bName, gauge, pName, rPrice, sLevel, eraCode));
             }
             resultSet.close();
             statement.close();
@@ -643,11 +640,12 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get the rolling stock with the same set code
-            String sqlQuery = "SELECT rs.productCode, rs.eraCode, p.partOfSetCode, " +
-                    "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
-                    "FROM RollingStock rs, Products p " +
+            String sqlQuery = "SELECT rs.productCode, rs.eraCode, p.brandName, p.productName, p.retailPrice, " +
+                    "p.gauge, p.stockLevel " +
+                    "FROM ProductsInSet ps, Products p, RollingStock rs " +
                     "WHERE p.productCode = rs.productCode " +
-                    "AND p.partOfSetCode = ?";
+                    "AND p.productCode = ps.productCode " +
+                    "AND ps.setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
             resultSet = statement.executeQuery(sqlQuery);
@@ -661,9 +659,8 @@ public class DatabaseOperations {
                 double rPrice = resultSet.getDouble("retailPrice");
                 String gauge  = resultSet.getString("gauge");
                 int sLevel = resultSet.getInt("stockLevel");
-                String psCode = resultSet.getString("partOfSetCode");
 
-                rollingStock.add(new RollingStock(pCode, bName, gauge, pName, rPrice, sLevel, psCode, eraCode));
+                rollingStock.add(new RollingStock(pCode, bName, gauge, pName, rPrice, sLevel, eraCode));
             }
             resultSet.close();
             statement.close();

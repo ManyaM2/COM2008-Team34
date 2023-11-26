@@ -42,6 +42,8 @@ public class ManagerView extends JFrame {
         JPanel emailPanel = new JPanel(new FlowLayout());
         emailPanel.add(emailLabel);
         emailPanel.add(emailField);
+        emailPanel.setMaximumSize(new Dimension(emailPanel.getWidth(), 50));
+        emailPanel.setMinimumSize(new Dimension(emailPanel.getWidth(), 50));
         staffPanel.add(emailPanel);
 
         java.util.List<Product> products = databaseOperations.getProducts(connection);
@@ -84,7 +86,7 @@ public class ManagerView extends JFrame {
         productSection.setLayout(layout);
 
         //Display product metadata
-        productDisplay = new JTextArea(10, 20);
+        productDisplay = new JTextArea(5, 20);
         productDisplay.setMaximumSize(new Dimension(250, 80));
         productDisplay.setMinimumSize(new Dimension(200, 40));
         productDisplay.setText("\n " + p.getProductCode() + " | " + p.getProductName() + "\n " + p.getBrandName() +

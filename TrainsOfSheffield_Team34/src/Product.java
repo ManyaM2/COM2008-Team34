@@ -4,7 +4,6 @@ public class Product {
     private String productName;
     private String productCode;
     private double retailPrice;
-    private String partOfSetCode;
     private int stockLevel;
 
 
@@ -14,7 +13,6 @@ public class Product {
     public String getProductCode() { return productCode; }
     public double getRetailPrice() { return retailPrice; }
     public int getStockLevel() { return stockLevel; }
-    public String getPartOfSetCode() {return partOfSetCode; } ;
     public String getScale(){
         String scale = "";
         switch (gauge){
@@ -34,14 +32,13 @@ public class Product {
     public void setRetailPrice(double rPrice) { retailPrice = rPrice;}
     public void setStockLevel(int sLevel) {stockLevel = sLevel;}
 
-    public Product(String pCode, String bName, String pName, double rPrice, String gauge, int sLevel, String psCode){
+    public Product(String pCode, String bName, String pName, double rPrice, String gauge, int sLevel){
         this.productCode = pCode;
         this.brandName = bName;
         this.productName = pName;
         this.retailPrice = rPrice;
         this.gauge = gauge;
         this.stockLevel = sLevel;
-        this.partOfSetCode = psCode;
     }
 
     /**
