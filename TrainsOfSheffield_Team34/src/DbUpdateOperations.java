@@ -252,8 +252,6 @@ public class DbUpdateOperations {
                     "haveConfirmed) Values(?,?,?,?,?,?,?)";
             PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
 
-
-
             // Ensure card details are hashed before inserting them
             String hashedPassword = HashedPasswordGenerator.hashPassword(password.toCharArray());
 
@@ -342,7 +340,7 @@ public class DbUpdateOperations {
         try{
             System.out.println(product.getProductName());
             String sqlQuery = "UPDATE Products " +
-                    "SET brandName = ?, productName = ?, retailPrice = ?, gauge = ?, stockLevel = ?, partOfSetCode = ? "
+                    "SET brandName = ?, productName = ?, retailPrice = ?, gauge = ?, stockLevel = ? "
                     + "WHERE productCode = ?";
             PreparedStatement statement =  connection.prepareStatement(sqlQuery);
             statement.setString(1, product.getBrandName());
@@ -350,8 +348,7 @@ public class DbUpdateOperations {
             statement.setDouble(3, product.getRetailPrice());
             statement.setString(4, product.getGauge());
             statement.setInt(5, product.getStockLevel());
-            statement.setString(6, product.getPartOfSetCode());
-            statement.setString(7, product.getProductCode());
+            statement.setString(6, product.getProductCode());
             statement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -361,7 +358,7 @@ public class DbUpdateOperations {
     public void addProduct(Connection connection, Product product) throws SQLException{
         try{
             String sqlQuery = "INSERT INTO Products (productCode, brandName, productName, " +
-                    "retailPrice, gauge, stockLevel, partOfSetCode) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    "retailPrice, gauge, stockLevel) VALUES (?, ?, ?, ?, ?, ?, ?) ";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, product.getProductCode());
             statement.setString(2, product.getBrandName());
@@ -369,17 +366,15 @@ public class DbUpdateOperations {
             statement.setDouble(4, product.getRetailPrice());
             statement.setString(5, product.getGauge());
             statement.setInt(6, product.getStockLevel());
-            statement.setString(7, product.getPartOfSetCode());
             statement.executeUpdate();
 
-            if (product.getPartOfSetCode() != null){
+            /*if (product.getProductCode() == "R%"){
                 String newQuery = "INSERT INTO ProductsInSet (productCode, setCode, quantity) VALUES (?, ?, ?)";
                 PreparedStatement newStatement = connection.prepareStatement(newQuery);
                 newStatement.setString(1, product.getProductCode());
-                newStatement.setString(2, product.getPartOfSetCode());
-                newStatement.setInt(3, 0);
+                newStatement.setInt(3, 1);
                 newStatement.executeUpdate();
-            }
+            }*/
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -397,7 +392,7 @@ public class DbUpdateOperations {
             deleteStatement.setString(1, product.getProductCode());
             deleteStatement.executeUpdate();
 
-            /*String updateQuery = "UPDATE Products SET PartOfSetCode=NULL WHERE PartOfSetCode = ?";
+            /*String updateQuery = "UPDATE Products ";
             PreparedStatement upStatement = connection.prepareStatement(updateQuery);
             upStatement.setString(1, product.getProductCode());
             upStatement.executeUpdate();*/

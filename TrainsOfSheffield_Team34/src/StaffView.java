@@ -305,7 +305,10 @@ public class StaffView extends JFrame {
                 JTextField retailPrice = new JTextField("");
                 JTextField gauge = new JTextField("");
                 JTextField stockLevel = new JTextField("");
-                JTextField partOfSetCode= new JTextField(null);
+                JTextField setCode = new JTextField("");
+                JTextField eraCode = new JTextField("");
+                JTextField dccCode = new JTextField("");
+                JTextField typeName = new JTextField("");
                 JPanel panel = new JPanel(new GridLayout(0, 1));
                 panel.add(new JLabel("Product Code"));
                 panel.add(productCode);
@@ -319,6 +322,14 @@ public class StaffView extends JFrame {
                 panel.add(gauge);
                 panel.add(new JLabel("Stock Level:"));
                 panel.add(stockLevel);
+                panel.add(new JLabel("Set Code (Optional):"));
+                panel.add(setCode);
+                panel.add(new JLabel("Era Code (Optional):"));
+                panel.add(eraCode);
+                panel.add(new JLabel("Dcc Code (Optional):"));
+                panel.add(dccCode);
+                panel.add(new JLabel("Type Name (Optional):"));
+                panel.add(typeName);
                 int result = JOptionPane.showConfirmDialog(null, panel, "New Product Details",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                 if (result == JOptionPane.OK_OPTION) {
@@ -329,9 +340,18 @@ public class StaffView extends JFrame {
                         Double rPrice = Double.valueOf(retailPrice.getText());
                         String g = gauge.getText();
                         Integer sLevel = Integer.parseInt(stockLevel.getText());
-                        String psCode = partOfSetCode.getText();
-                        Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel, psCode);
+                        Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel);
                         databaseUpdateOps.addProduct(connection, newProduct);
+
+                        //Copnsiderations for the specific types of products
+                        String sCode = setCode.getText();
+                        String eCode = eraCode.getText();
+                        String dCode = dccCode.getText();
+                        String tName = typeName.getText();
+
+                        //RollingStock newRolling = new RollingStock(pCode,bName,)
+
+
                         reloadProducts(connection, databaseOperations);
                     } catch (Exception ex){
                         ex.printStackTrace();
@@ -405,7 +425,6 @@ public class StaffView extends JFrame {
                 JTextField retailPrice = new JTextField(String.valueOf(p.getRetailPrice()));
                 JTextField gauge = new JTextField(p.getGauge());
                 JTextField stockLevel = new JTextField(String.valueOf(p.getStockLevel()));
-                JTextField partOfSetCode= new JTextField(p.getProductCode());
                 JPanel panel = new JPanel(new GridLayout(0, 1));
                 panel.add(new JLabel("Product Code"));
                 panel.add(productCode);
@@ -429,7 +448,6 @@ public class StaffView extends JFrame {
                         Double rPrice = Double.valueOf(retailPrice.getText());
                         String g = gauge.getText();
                         Integer sLevel = Integer.parseInt(stockLevel.getText());
-                        String psCode = partOfSetCode.getText();
                         p.setProductCode(pCode);
                         p.setProductName(pName);
                         p.setBrandName(bName);
