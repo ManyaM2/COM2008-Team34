@@ -161,9 +161,11 @@ public class DatabaseOperations {
                 String email = resultSet.getString(4);
                 List<String> roles = getRole(connection, userID);
 
-                staff.add(new User(forename, surname, email, roles));
+                if (roles.contains(role))
+                    staff.add(new User(forename, surname, email, roles, userID));
             }
             resultSet.close();
+            statement.close();
             statement.close();
         } catch (Exception e) {
             e.printStackTrace();

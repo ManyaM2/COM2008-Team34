@@ -449,6 +449,61 @@ public class DbUpdateOperations {
         }
     }
 
+    /**
+     * Adds a customer to staff
+     * @param connection
+     * @param email
+     * @return True if the customer exists and is not staff already, false otherwise
+     */
+    public boolean addToStaff(Connection connection, String email) {
+        // Query the database to fetch user information
+        try {
+            // Check a user with the email address exists
+            String sql = "SELECT userID FROM Users WHERE email = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, email);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int userID = resultSet.getInt("userID");
+                // Check the user is not already staff
+                String staffSql = "SELECT userID FROM Roles WHERE roleName = ? AND userID = ?";
+                PreparedStatement staffStatement = connection.prepareStatement(staffSql);
+                staffStatement.setString(1, "Staff");
+                staffStatement.setInt(2, userID);
+                ResultSet staffResultSet = staffStatement.executeQuery();
+
+                if (staffResultSet.next()){
+                    return false;
+                } else {
+                    // Give the user a staff role
+                    String insertQuery = "INSERT INTO Roles VALUES (?, ?)";
+                    PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+                    insertStatement.setInt(1, userID);
+                    insertStatement.setString(2, "Staff");
+                    insertStatement.executeUpdate();
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void removeFromStaff(Connection connection, User user) {
+        // Query the database to fetch user information
+        try {
+            String insertQuery = "DELETE FROM Roles WHERE roleName = ? AND userID = ?";
+            PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+            insertStatement.setString(1, "Staff");
+            insertStatement.setInt(2, user.getUserID());
+            insertStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void deleteProduct(Connection connection, Product product) throws SQLException{
         try{
             String setQuery = "DELETE FROM ProductsInSet WHERE productCode = ?";

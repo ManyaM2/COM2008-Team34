@@ -95,6 +95,22 @@ public class StaffView extends JFrame {
             managerButton.setVisible(false);
         this.setVisible(true);
 
+        managerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Close the current window
+                dispose();
+                // Open a new window
+                ManagerView newWindow = null;
+                try {
+                    newWindow = new ManagerView(connection);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                newWindow.setVisible(true);
+            }
+        });
+
         prevItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
