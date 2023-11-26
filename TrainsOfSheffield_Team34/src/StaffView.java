@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -299,6 +301,9 @@ public class StaffView extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String[] productType = {"Track Pack", "Locomotive", "Train Set", "Controller", "Track Piece", "Rolling Stock"};
+                JComboBox<String> types = new JComboBox<>(productType);
+
                 JTextField productCode = new JTextField("");
                 JTextField brandName = new JTextField("");
                 JTextField productName = new JTextField("");
@@ -306,11 +311,26 @@ public class StaffView extends JFrame {
                 JTextField gauge = new JTextField("");
                 JTextField stockLevel = new JTextField("");
                 JTextField setCode = new JTextField("");
+
                 JTextField eraCode = new JTextField("");
+                JLabel ec = new JLabel("Era Code:");
+
                 JTextField dccCode = new JTextField("");
+                JLabel dc = new JLabel("Dcc Code:");
+
                 JTextField typeName = new JTextField("");
+                JLabel tn = new JLabel("Type Name:") ;
+
+                JTextField controllerType = new JTextField("");
+                JLabel ct = new JLabel("Controller Type:");
+
                 JPanel panel = new JPanel(new GridLayout(0, 1));
-                panel.add(new JLabel("Product Code"));
+                JScrollPane scrollablePanel = new JScrollPane(panel);
+
+                panel.add(new JLabel("Select type:"));
+                panel.add(types);
+
+                panel.add(new JLabel("Product Code:"));
                 panel.add(productCode);
                 panel.add(new JLabel("Brand Name:"));
                 panel.add(brandName);
@@ -324,13 +344,45 @@ public class StaffView extends JFrame {
                 panel.add(stockLevel);
                 panel.add(new JLabel("Set Code (Optional):"));
                 panel.add(setCode);
-                panel.add(new JLabel("Era Code (Optional):"));
-                panel.add(eraCode);
-                panel.add(new JLabel("Dcc Code (Optional):"));
-                panel.add(dccCode);
-                panel.add(new JLabel("Type Name (Optional):"));
-                panel.add(typeName);
-                int result = JOptionPane.showConfirmDialog(null, panel, "New Product Details",
+
+                types.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String pType = types.getSelectedItem().toString();
+                        panel.remove(ec);
+                        panel.remove(eraCode);
+                        panel.remove(dc);
+                        panel.remove(dccCode);
+                        panel.remove(tn);
+                        panel.remove(typeName);
+                        panel.remove(ct);
+                        panel.remove(controllerType);
+                        switch(pType){
+                            case "Locomotive":
+                                panel.add(ec);
+                                panel.add(eraCode);
+                                panel.add(dc);
+                                panel.add(dccCode);
+                                break;
+                            case "Controller":
+                                panel.add(tn);
+                                panel.add(typeName);
+                                break;
+                            case "Rolling Stock":
+                                panel.add(ec);
+                                panel.add(eraCode);
+                                break;
+                            case "Train Set":
+                                panel.add(ec);
+                                panel.add(eraCode);
+                                panel.add(ct);
+                                panel.add(controllerType);
+                                break;
+                        }
+                    }
+                });
+
+                int result = JOptionPane.showConfirmDialog(null, scrollablePanel, "New Product Details",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                 if (result == JOptionPane.OK_OPTION) {
                     try {
@@ -341,17 +393,39 @@ public class StaffView extends JFrame {
                         String g = gauge.getText();
                         Integer sLevel = Integer.parseInt(stockLevel.getText());
                         Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel);
-                        databaseUpdateOps.addProduct(connection, newProduct);
 
-                        //Copnsiderations for the specific types of products
+                        //Considerations for the specific types of products
                         String sCode = setCode.getText();
                         String eCode = eraCode.getText();
                         String dCode = dccCode.getText();
                         String tName = typeName.getText();
+                        String cType =controllerType.getText();
 
-                        //RollingStock newRolling = new RollingStock(pCode,bName,)
+                        String typeProduct = Character.toString(pCode.charAt(0));
 
 
+                        if (typeProduct.equals("L")){
+                            Locomotive newLocomotive = new Locomotive(pCode,bName,g, pName,rPrice,sLevel,eCode, dCode);
+                            databaseUpdateOps.addLocomotive(connection, newLocomotive);
+                        }
+                        else if (typeProduct.equals("S")){
+                            RollingStock newRollingStock = new RollingStock(pCode,bName,g, pName,rPrice,sLevel,eCode);
+                            databaseUpdateOps.addRollingStcok(connection, newRollingStock);
+                        }
+                        else if (typeProduct.equals("C")){
+                            Controller newController = new Controller(pCode,bName,g, pName,rPrice,sLevel,tName);
+                            databaseUpdateOps.addController(connection, newController);
+                        }
+                        else if (typeProduct.equals("M")){
+                            Set newSet = new Set(pCode,bName,g, pName,rPrice,sLevel,null,cType);
+                            databaseUpdateOps.addTrainSet(connection, newSet);
+                        }
+                        else {
+                            databaseUpdateOps.addProduct(connection, newProduct);
+                        }
+                        if (!sCode.isBlank()){
+                            databaseUpdateOps.addToSet(connection, newProduct, sCode);
+                        }
                         reloadProducts(connection, databaseOperations);
                     } catch (Exception ex){
                         ex.printStackTrace();
@@ -363,6 +437,10 @@ public class StaffView extends JFrame {
         });
 
 
+
+    }
+
+    public void basicLabels(JPanel panel){
 
     }
 

@@ -11,10 +11,9 @@ public class Set extends Product{
     public int getSetID(){return setID;}
     public String getControllerType(){return controllerType;}
     public List<Product> getProductCodes(){ return productCodes; }
-    public Set(int setID, String bName, String gauge, String pName, double rPrice, int sLevel, List<Product> products,
-               String controllerType, String pCode) {
+    public Set(String pCode, String bName, String gauge, String pName, double rPrice, int sLevel, List<Product> products,
+               String controllerType) {
         super(pCode, bName, pName, rPrice, gauge, sLevel);
-        this.setID = setID;
         this.productCodes = products;
         this.controllerType = controllerType;
     }

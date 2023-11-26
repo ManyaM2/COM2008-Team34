@@ -287,7 +287,7 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
-            String sqlQuery = "SELECT s.setID, s.productCode, s.controllerType, " +
+            String sqlQuery = "SELECT s.productCode, s.controllerType, " +
                     "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Sets s, Products p " +
                     "WHERE p.productCode = s.productCode " +
@@ -297,7 +297,6 @@ public class DatabaseOperations {
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
-                int setID = resultSet.getInt("setID");
                 String productCode = resultSet.getString("productCode");
                 String controllerType = resultSet.getString("controllerType");
                 String brandName  = resultSet.getString("brandName");
@@ -313,8 +312,8 @@ public class DatabaseOperations {
                 setContents.addAll(getRollingStock(connection, productCode));
                 setContents.addAll(getTrackPacks(connection, productCode));
 
-                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, setContents,
-                        controllerType, productCode));
+                sets.add(new Set(productCode, brandName, gauge, productName, retailPrice, stockLevel, setContents,
+                        controllerType));
             }
             resultSet.close();
             statement.close();
@@ -328,7 +327,7 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
-            String sqlQuery = "SELECT s.setID, s.productCode, s.controllerType, " +
+            String sqlQuery = "SELECT s.productCode, s.controllerType, " +
                     "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Sets s, Products p " +
                     "WHERE p.productCode = s.productCode " +
@@ -338,7 +337,6 @@ public class DatabaseOperations {
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
-                int setID = resultSet.getInt("setID");
                 String productCode = resultSet.getString("productCode");
                 String controllerType = resultSet.getString("controllerType");
                 String brandName  = resultSet.getString("brandName");
@@ -351,8 +349,8 @@ public class DatabaseOperations {
                 List<Product> setContents = new ArrayList<>();
                 setContents.addAll(getTrackPieces(connection, productCode));
 
-                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, setContents,
-                        controllerType, productCode));
+                sets.add(new Set(productCode, brandName, gauge, productName, retailPrice, stockLevel, setContents,
+                        controllerType));
             }
             resultSet.close();
             statement.close();
@@ -366,7 +364,7 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the orders from the database
-            String sqlQuery = "SELECT s.setID, s.productCode, s.controllerType, " +
+            String sqlQuery = "SELECT s.productCode, s.controllerType, " +
                     "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Sets s, Products p, ProductsInSet ps " +
                     "WHERE p.productCode = s.productCode " +
@@ -379,7 +377,6 @@ public class DatabaseOperations {
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
-                int setID = resultSet.getInt("setID");
                 String productCode = resultSet.getString("productCode");
                 String controllerType = resultSet.getString("controllerType");
                 String brandName  = resultSet.getString("brandName");
@@ -392,8 +389,8 @@ public class DatabaseOperations {
                 List<Product> setContents = new ArrayList<>();
                 setContents.addAll(getTrackPieces(connection, productCode));
 
-                sets.add(new Set(setID, brandName, gauge, productName, retailPrice, stockLevel, setContents,
-                        controllerType, productCode));
+                sets.add(new Set(productCode, brandName, gauge, productName, retailPrice, stockLevel, setContents,
+                        controllerType));
             }
             resultSet.close();
             statement.close();

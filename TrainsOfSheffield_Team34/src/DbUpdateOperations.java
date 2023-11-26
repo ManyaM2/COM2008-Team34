@@ -358,7 +358,7 @@ public class DbUpdateOperations {
     public void addProduct(Connection connection, Product product) throws SQLException{
         try{
             String sqlQuery = "INSERT INTO Products (productCode, brandName, productName, " +
-                    "retailPrice, gauge, stockLevel) VALUES (?, ?, ?, ?, ?, ?, ?) ";
+                    "retailPrice, gauge, stockLevel) VALUES (?, ?, ?, ?, ?, ?) ";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, product.getProductCode());
             statement.setString(2, product.getBrandName());
@@ -367,15 +367,84 @@ public class DbUpdateOperations {
             statement.setString(5, product.getGauge());
             statement.setInt(6, product.getStockLevel());
             statement.executeUpdate();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
-            /*if (product.getProductCode() == "R%"){
+    public void addLocomotive(Connection connection, Locomotive locomotive) throws  SQLException{
+        try{
+            addProduct(connection, locomotive);
+            String addQuery = "INSERT INTO Locomotives (productCode, dccCode, eraCode) VALUES (?, ?, ?) ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, locomotive.getProductCode());
+            statement.setString(2, locomotive.getDccCode());
+            statement.setString(3, locomotive.getEraCode());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addController(Connection connection, Controller controller) throws  SQLException{
+        try{
+            addProduct(connection, controller);
+            String addQuery = "INSERT INTO Controller(productCode, typeName) VALUES (?, ?) ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, controller.getProductCode());
+            statement.setString(2, controller.getTypeName());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addRollingStcok(Connection connection, RollingStock rollingStock) throws  SQLException{
+        try{
+            addProduct(connection, rollingStock);
+            String addQuery = "INSERT INTO Rolling Stock (productCode, eraCode) VALUES (?, ?) ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, rollingStock.getProductCode());
+            statement.setString(2, rollingStock.getEraCode());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addTrainSet(Connection connection, Set trainSet) throws  SQLException{
+        try{
+            addProduct(connection, trainSet);
+            String addQuery = "INSERT INTO Rolling Stock (productCode, eraCode, controllerType) VALUES (?, ?, ?) ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, trainSet.getProductCode());
+            statement.setString(2, trainSet.getEra());
+            statement.setString(3, trainSet.getControllerType());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addToSet(Connection connection, Product product, String setCode) throws  SQLException{
+        try{
+            String sqlQuery = "SELECT productCode FROM Products WHERE productCode = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setString(1, setCode);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
                 String newQuery = "INSERT INTO ProductsInSet (productCode, setCode, quantity) VALUES (?, ?, ?)";
                 PreparedStatement newStatement = connection.prepareStatement(newQuery);
                 newStatement.setString(1, product.getProductCode());
+                newStatement.setString(2, setCode);
                 newStatement.setInt(3, 1);
                 newStatement.executeUpdate();
-            }*/
-        } catch (Exception e){
+            }
+        }  catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -392,10 +461,25 @@ public class DbUpdateOperations {
             deleteStatement.setString(1, product.getProductCode());
             deleteStatement.executeUpdate();
 
-            /*String updateQuery = "UPDATE Products ";
-            PreparedStatement upStatement = connection.prepareStatement(updateQuery);
-            upStatement.setString(1, product.getProductCode());
-            upStatement.executeUpdate();*/
+            String locQuery = "DELETE FROM Locomotives WHERE productCode = ?";
+            PreparedStatement locStatement = connection.prepareStatement(locQuery);
+            locStatement.setString(1, product.getProductCode());
+            locStatement.executeUpdate();
+
+            String conQuery = "DELETE FROM Controller WHERE productCode = ?";
+            PreparedStatement conStatement = connection.prepareStatement(conQuery);
+            conStatement.setString(1, product.getProductCode());
+            conStatement.executeUpdate();
+
+            String rolQuery = "DELETE FROM RollingStock WHERE productCode = ?";
+            PreparedStatement rolStatement = connection.prepareStatement(rolQuery);
+            rolStatement.setString(1, product.getProductCode());
+            rolStatement.executeUpdate();
+
+            String sQuery = "DELETE FROM Sets WHERE productCode = ?";
+            PreparedStatement setStatement = connection.prepareStatement(sQuery);
+            setStatement.setString(1, product.getProductCode());
+            setStatement.executeUpdate();
 
             String sqlQuery = "DELETE FROM Products WHERE productCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
