@@ -50,4 +50,12 @@ public class Set extends Product{
         }
         return returnString;
     }
+
+    public boolean inStock() {
+        for (Product p : productCodes) {
+            if (!p.inStock())
+                return false;
+        }
+        return true;
+    }
 }

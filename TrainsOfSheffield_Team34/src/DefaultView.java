@@ -113,6 +113,10 @@ public class DefaultView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield | Home - Locomotives");
                 productPanel.removeAll();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                productPanel.setLayout(layout);
                 List<Locomotive> products = null;
                 try {
                     products = databaseOperations.getLocomotives(connection);
@@ -415,6 +419,7 @@ public class DefaultView extends JFrame {
     }
 
     public JPanel getOrderLine(Connection connection, OrderLine ol, Order o, int counter){
+        boolean outOfStock = false;
         DatabaseOperations dbOps = new DatabaseOperations();
         DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
         JPanel orderLineSection = new JPanel();
@@ -440,8 +445,16 @@ public class DefaultView extends JFrame {
         });
 
         //Make a spinner to edit the quantity of the product
-        JSpinner selectQuantity = new JSpinner(new SpinnerNumberModel(ol.getProductQuantity(), 1,
-                lineProduct.getStockLevel(), 1));
+        JSpinner selectQuantity = null;
+        if (lineProduct.getStockLevel() >= 1) {
+            selectQuantity = new JSpinner(new SpinnerNumberModel(ol.getProductQuantity(), 1,
+                    lineProduct.getStockLevel(), 1));
+        } else {
+            outOfStock = true;
+            selectQuantity = new JSpinner(new SpinnerNumberModel(ol.getProductQuantity(), 1,
+                    2, 1));
+        }
+
         JLabel qLabel = new JLabel("Edit quantity: ");
         JSpinner finalSelectQuantity = selectQuantity;
         selectQuantity.addChangeListener(new ChangeListener() {
@@ -471,7 +484,7 @@ public class DefaultView extends JFrame {
         }
         orderlineDisplay.setEditable(false);
 
-        if (o.getStatus() == OrderStatus.PENDING){
+        if (o.getStatus() == OrderStatus.PENDING && !outOfStock){
             buttonPanel.add(qLabel);
             buttonPanel.add(finalSelectQuantity);
             buttonPanel.add(removeOrderLineButton);

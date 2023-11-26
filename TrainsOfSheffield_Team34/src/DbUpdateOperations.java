@@ -85,6 +85,17 @@ public class DbUpdateOperations {
         }
     }
 
+    public void removeOrder(Connection connection, Order o) throws SQLException{
+        try {
+            String updateQuery = "DELETE FROM Orders WHERE orderNumber = ?";
+            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+            updateStatement.setInt(1, o.getOrderNumber());
+            updateStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Update the quantity of an orderline (sets productQuantity to ol.getProductQuantity())
      * @param connection

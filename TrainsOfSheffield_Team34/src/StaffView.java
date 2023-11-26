@@ -1,4 +1,8 @@
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,17 +10,21 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class StaffView extends JFrame {
+    private DecimalFormat moneyFormat = new DecimalFormat("0.00");
     private JMenuBar menu;
     private JButton managerButton;
     private JButton editButton;
     private JButton deleteButton;
     private JButton addButton;
     private JPanel productPanel;
+    private JPanel orderPanel;
     private JTextArea productDisplay;
     private JTextArea orderDisplay;
 
@@ -53,14 +61,14 @@ public class StaffView extends JFrame {
         JMenuItem homeItem = new JMenuItem("Home");
         homeItem.setMaximumSize(new Dimension(45, 50));
 
-        JMenuItem detailsItem = new JMenuItem("View Orders");
-        detailsItem.setMaximumSize((new Dimension(80,50)));
+        JMenuItem orderItem = new JMenuItem("View Orders");
+        orderItem.setMaximumSize((new Dimension(80,50)));
 
         menu = new JMenuBar();
         menu.add(prevItem);
         menu.add(homeItem);
         menu.add(productsMenu);
-        menu.add(detailsItem);
+        menu.add(orderItem);
 
         // Display the products
         productPanel = new JPanel();
@@ -289,28 +297,10 @@ public class StaffView extends JFrame {
             }
         });
 
-        detailsItem.addActionListener(new ActionListener() {
+        orderItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setTitle("Trains of Sheffield (Staff) | Orders");
-                productPanel.removeAll();
-                GridLayout layout1 = new GridLayout(1,1);
-                layout1.setHgap(5);
-                layout1.setVgap(0);
-                productPanel.setLayout(layout1);
-                List<Order> orders = null;
-                try {
-                    orders = databaseOperations.getOrders(connection);
-                    for (Order o : orders){
-                        productPanel.add(getOrderSection(o));
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-                //Encapsulate the product panel in a scrollable panel (to make it scrollable)
-                JScrollPane scrollableOrders = new JScrollPane(productPanel);
-                revalidate();
-                repaint();
+                reloadMyOrders(connection, databaseOperations);
             }
         });
 
@@ -451,9 +441,6 @@ public class StaffView extends JFrame {
                 }
             }
         });
-
-
-
     }
 
     public void basicLabels(JPanel panel){
@@ -594,33 +581,187 @@ public class StaffView extends JFrame {
         repaint();
     }
 
-    public JPanel getOrderSection(Order o){
-        JPanel orderSection = new JPanel();
+    public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations){
+        setTitle("Trains of Sheffield | Profile - My Orders");
+        productPanel.removeAll();
+        BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
+        productPanel.setLayout(layout);
+        List<Order> orders = null;
+        try {
+            // Display confirmed orders
+            orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+            orders.removeIf(n -> (n.getStatus() != OrderStatus.CONFIRMED));
+            for (int i = 0; i < orders.size(); i++) {
+                productPanel.add(getOrderPanel(orders.get(i), connection, i));
+            }
+            for (Order o : orders){
+
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        revalidate();
+        repaint();
+    }
+
+    public JPanel getOrderPanel(Order o, Connection connection, int counter){
+        DatabaseOperations dbOps = new DatabaseOperations();
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        User currentUser = CurrentUserManager.getCurrentUser();
+
+        // Set the layout and border of the order section
+        JPanel orderPanel = new JPanel();
+        GridLayout layout = new GridLayout(0,3);
+        layout.setHgap(5);
+        layout.setVgap(0);
+        orderPanel.setLayout(layout);
+        TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                ("Order " + o.getOrderNumber()));
+        title.setTitleJustification(TitledBorder.LEFT);
+        orderPanel.setBorder(title);
+
+        // Display order metadata
+        JPanel metadataPanel = new JPanel();
+        metadataPanel.setLayout(new BoxLayout(metadataPanel, BoxLayout.Y_AXIS));
+        JTextArea orderMetadataDisplay = new JTextArea(10, 20);
+        orderMetadataDisplay.setMaximumSize(new Dimension(250, 80));
+        orderMetadataDisplay.setMinimumSize(new Dimension(200, 80));
+        orderMetadataDisplay.setText(" Status: " + o.getStatus() + " | Date: " + o.getDateMade() + "\n " +
+                currentUser.getUserForename() + " " + currentUser.getUserSurname() + "\n " +
+                currentUser.getUserEmail() + "\n\n " + currentUser.getAddress(connection).toString() +
+                "\n\n Total cost: £" + moneyFormat.format(o.totalCost(connection)));
+        orderMetadataDisplay.setEditable(false);
+        metadataPanel.add(orderMetadataDisplay);
+
         JPanel buttonPanel = new JPanel();
-        JButton selectButton = new JButton("Order " + o.getOrderNumber());
-        JButton fulfillButton = new JButton("Fulfill");
-        deleteButton = new JButton ("Delete");
 
-        GridLayout layout1 = new GridLayout(2,1);
-        BoxLayout layout2 = new BoxLayout(orderSection, BoxLayout.Y_AXIS);
-        orderSection.setLayout(layout2);
+        // Add a button to confirm the order
+        JButton confirmButton = new JButton("Fulfill order");
+        confirmButton.setMaximumSize(new Dimension(100,30));
+        confirmButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateStockLevel(connection, o)){
+                    o.setStatus(connection, OrderStatus.FULFILLED);
+                } else {
+                    JOptionPane.showMessageDialog(orderPanel,"Not enough stock | Please decline order ",
+                            "Can't fullfil", 0);
+                }
+                JOptionPane.showMessageDialog(confirmButton, "Order fulfilled");
+                reloadMyOrders(connection, dbOps);
+            }
+        });
 
+        JButton deleteButton = new JButton("Decline order");
+        deleteButton.setMaximumSize(new Dimension(100,30));
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //Delete order
+                for (OrderLine ol : o.getOrderLines()) {
+                    try {
+                        dbUpdateOps.removeOrderLine(connection, ol);
+                        dbUpdateOps.removeOrder(connection, o);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                JOptionPane.showMessageDialog(confirmButton, "Order deleted");
+                reloadMyOrders(connection, dbOps);
+            }
+        });
 
-        //Display product metadata
-        orderDisplay = new JTextArea(50, 15);
-        orderDisplay.setMaximumSize(new Dimension(250, 80));
-        orderDisplay.setMinimumSize(new Dimension(200, 80));
-        orderDisplay.setText("\n " + o.getOrderNumber() + " | " + o.getOrderLines() + " | " + o.getUserID() + "\n " + o.getStatus() +
-                "\n " + o.getDateMade() + "\n"  );
+        if (counter == 0) {
+            buttonPanel.add(confirmButton);
+            buttonPanel.add(deleteButton);
+        }
+        metadataPanel.add(buttonPanel);
+        metadataPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        orderPanel.add(metadataPanel);
 
-        buttonPanel.add(fulfillButton);
-        buttonPanel.add(deleteButton);
+        // Add the products to the order section
+        for (int i = 0; i < o.getOrderLines().size(); i++)
+            orderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
 
-        //Add button to order the product
-        buttonPanel.add(selectButton);
-        orderSection.add(orderDisplay);
-        orderSection.add(buttonPanel);
-        return orderSection;
+        return orderPanel;
+    }
+
+    public JPanel getOrderLine(Connection connection, OrderLine ol, Order o, int counter){
+        DatabaseOperations dbOps = new DatabaseOperations();
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        JPanel orderLineSection = new JPanel();
+        //Get the product represented in the orderLine
+        Product lineProduct = ol.getProduct(connection);
+
+        BoxLayout layout = new BoxLayout(orderLineSection, BoxLayout.Y_AXIS);
+        orderLineSection.setLayout(layout);
+
+        //Display orderline metadata
+        JTextArea orderlineDisplay = new JTextArea(10, 20);
+        orderlineDisplay.setMaximumSize(new Dimension(250, 80));
+        orderlineDisplay.setMinimumSize(new Dimension(200, 80));
+        if (lineProduct != null){
+            orderlineDisplay.setText(String.format("\n " + ol.getProductCode() + " | " + lineProduct.getProductName() +
+                    "\n " + lineProduct.getBrandName() + "\n Product Quantity: " + ol.getProductQuantity() +
+                    "\n Line cost: £" + moneyFormat.format(ol.lineCost(connection))));
+        }
+        orderlineDisplay.setEditable(false);
+
+        orderLineSection.add(orderlineDisplay);
+        TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                ("Orderline " + counter));
+        title.setTitleJustification(TitledBorder.LEFT);
+        orderLineSection.setBorder(title);
+        return orderLineSection;
+    }
+
+    public boolean updateStockLevel(Connection connection, Order o) {
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        DatabaseOperations dbOps = new DatabaseOperations();
+        for (OrderLine ol : o.getOrderLines()){
+            try {
+                Product product = ol.getProduct(connection);
+                if (product.getStockLevel() >= ol.getProductQuantity()){
+                    dbUpdateOps.updateStockLevel(connection, 0 - ol.getProductQuantity(), product);
+                } else {
+                    return false;
+                }
+
+                // If the product is a set, the stock levels of it's other products are decreased
+                if (product instanceof Set){
+                    List<Product> products = ((Set)product).getProductCodes();
+                    List<Integer> productQuantities = dbOps.getComponentsQuantity(connection, (Set)product);
+                    for (int i = 0 ; i < products.size(); i++){
+                        if (products.get(i).getStockLevel() >= productQuantities.get(i)){
+                            dbUpdateOps.updateStockLevel(connection, 0 - productQuantities.get(i),
+                                    products.get(i));
+                        } else {
+                            dbUpdateOps.updateStockLevel(connection, ol.getProductQuantity(), product);
+                            return false;
+                        }
+
+                        // If set is a train set, it will also contain a track pack
+                        if (product instanceof Set){
+                            List<Product> productsb = ((Set)product).getProductCodes();
+                            List<Integer> productQuantitiesb = dbOps.getComponentsQuantity(connection,
+                                    (Set)product);
+                            for (int j = 0 ; j < productsb.size(); j++){
+                                if (productsb.get(i).getStockLevel() >= productQuantitiesb.get(i)){
+                                    dbUpdateOps.updateStockLevel(connection,
+                                            0 - productQuantitiesb.get(j), productsb.get(j));
+                                } else {
+                                    dbUpdateOps.updateStockLevel(connection, productQuantities.get(i), products.get(i));
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return true;
     }
 }
 
