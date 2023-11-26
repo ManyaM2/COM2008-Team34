@@ -252,6 +252,8 @@ public class DbUpdateOperations {
                     "haveConfirmed) Values(?,?,?,?,?,?,?)";
             PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
 
+
+
             // Ensure card details are hashed before inserting them
             String hashedPassword = HashedPasswordGenerator.hashPassword(password.toCharArray());
 
@@ -263,6 +265,20 @@ public class DbUpdateOperations {
             updateStatement.setString(6, address.getPostCode());
             updateStatement.setBoolean(7, false);
             updateStatement.executeUpdate();
+
+            String selectQuery = "SELECT userID FROM Users WHERE email = ? AND password = ?";
+            PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+            selectStatement.setString(1, user.getUserEmail());
+            selectStatement.setString(2, hashedPassword);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()){
+                updateQuery = "INSERT INTO Roles Values(?,?)";
+                PreparedStatement newStatement = connection.prepareStatement(updateQuery);
+                newStatement.setInt(1, resultSet.getInt("userID"));
+                newStatement.setString(2, "Customer");
+                newStatement.executeUpdate();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -324,17 +340,18 @@ public class DbUpdateOperations {
 
     public void editProductDetails(Connection connection, Product product) throws SQLException{
         try{
+            System.out.println(product.getProductName());
             String sqlQuery = "UPDATE Products " +
                     "SET brandName = ?, productName = ?, retailPrice = ?, gauge = ?, stockLevel = ?, partOfSetCode = ? "
                     + "WHERE productCode = ?";
             PreparedStatement statement =  connection.prepareStatement(sqlQuery);
-            statement.setString(1, product.getProductCode());
-            statement.setString(2, product.getBrandName());
-            statement.setString(3, product.getProductName());
-            statement.setDouble(4, product.getRetailPrice());
-            statement.setString(5, product.getGauge());
-            statement.setInt(6, product.getStockLevel());
-            statement.setString(7, product.getPartOfSetCode());
+            statement.setString(1, product.getBrandName());
+            statement.setString(2, product.getProductName());
+            statement.setDouble(3, product.getRetailPrice());
+            statement.setString(4, product.getGauge());
+            statement.setInt(5, product.getStockLevel());
+            statement.setString(6, product.getPartOfSetCode());
+            statement.setString(7, product.getProductCode());
             statement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

@@ -89,7 +89,7 @@ public class StaffView extends JFrame {
         this.add(belowPanel, BorderLayout.SOUTH);
         this.add(scrollableProducts, BorderLayout.CENTER);
 
-        if (!CurrentUserManager.getCurrentUser().getUserRoles().contains("manager"))
+        if (!CurrentUserManager.getCurrentUser().getUserRoles().contains("Manager"))
             managerButton.setVisible(false);
         this.setVisible(true);
 

@@ -66,7 +66,7 @@ public class DatabaseOperations {
 
             // Add them to the list of strings
             while (resultSet.next()) {
-                String roleName = resultSet.getString(2);
+                String roleName = resultSet.getString(1);
                 roles.add(roleName);
             }
             resultSet.close();
@@ -111,6 +111,12 @@ public class DatabaseOperations {
         return users;
     }
 
+    /**
+     * Get a specific user based on username
+     * @param connection
+     * @param username
+     * @return
+     */
     public User getUser(Connection connection, String username) {
         User user = null;
         try {
@@ -136,6 +142,35 @@ public class DatabaseOperations {
         }
         return user;
     }
+
+    public List<User> getUserOfRole(Connection connection, String role) throws SQLException {
+        List<User> staff = new ArrayList<>();
+        ResultSet resultSet = null;
+        try {
+            //Get all the users in the database
+            String sqlQuery = "SELECT userID, forename, surname, email " +
+                    "FROM Users";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            resultSet = statement.executeQuery(sqlQuery);
+
+            // Add the users to the list of users
+            while (resultSet.next()) {
+                int userID = resultSet.getInt(1);
+                String forename = resultSet.getString(2);
+                String surname = resultSet.getString(3);
+                String email = resultSet.getString(4);
+                List<String> roles = getRole(connection, userID);
+
+                staff.add(new User(forename, surname, email, roles));
+            }
+            resultSet.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return staff;
+    }
+
 
     /**
      * @param connection
@@ -724,7 +759,6 @@ public class DatabaseOperations {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("User not found.");
         return false;
     }
 

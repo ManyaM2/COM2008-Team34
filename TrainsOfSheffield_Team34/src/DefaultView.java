@@ -86,11 +86,11 @@ public class DefaultView extends JFrame {
         staffButton.setMaximumSize(new Dimension(40, staffButton.getPreferredSize().height));
 
         //Don't display the staff button if the user is not a staff/manager
-        if (!CurrentUserManager.getCurrentUser().getUserRoles().contains("staff") && !CurrentUserManager.getCurrentUser().getUserRoles().contains("manager"))
+        if (!CurrentUserManager.getCurrentUser().getUserRoles().contains("Staff") &&
+                !CurrentUserManager.getCurrentUser().getUserRoles().contains("Manager"))
             staffButton.setVisible(false);
 
         this.setVisible(true);
-
 
         // Create an ActionListener for the staff button
         staffButton.addActionListener(new ActionListener() {
