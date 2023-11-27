@@ -68,11 +68,15 @@ public class StaffView extends JFrame {
         ordersMenu.add(pendingOrdersItem);
         ordersMenu.add(allOrdersItem);
 
+        JLabel hiUser = new JLabel("Hi " + CurrentUserManager.getCurrentUser().getUserForename() + "!  ");
+
         menu = new JMenuBar();
         menu.add(prevItem);
         menu.add(homeItem);
         menu.add(productsMenu);
         menu.add(ordersMenu);
+        menu.add(Box.createGlue());
+        menu.add(hiUser);
 
         // Display the products
         productPanel = new JPanel();

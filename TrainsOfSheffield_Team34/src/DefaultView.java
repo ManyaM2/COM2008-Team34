@@ -55,10 +55,14 @@ public class DefaultView extends JFrame {
         profileMenu.add(editDetailsItem);
         profileMenu.add(myOrdersItem);
 
+        JLabel hiUser = new JLabel("Hi " + CurrentUserManager.getCurrentUser().getUserForename() + "!  ");
+
         menu = new JMenuBar();
         menu.add(homeItem);
         menu.add(productsMenu);
         menu.add(profileMenu);
+        menu.add(Box.createGlue());
+        menu.add(hiUser);
 
         //Make the staff area button
         JPanel bottomPanel = new JPanel();

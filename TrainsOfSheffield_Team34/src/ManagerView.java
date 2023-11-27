@@ -48,8 +48,12 @@ public class ManagerView extends JFrame {
 
         emailPanel = new JPanel(new FlowLayout());
 
+        JLabel hiUser = new JLabel("Hi " + CurrentUserManager.getCurrentUser().getUserForename() + "!  ");
+
         menu = new JMenuBar();
         menu.add(backItem);
+        menu.add(Box.createGlue());
+        menu.add(hiUser);
 
         staffPanel = new JPanel();
         GridLayout layout = new GridLayout(0, 1);

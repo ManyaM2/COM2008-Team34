@@ -64,12 +64,14 @@ public class LoginView extends JFrame {
                 if (databaseOperations.verifyLogin(connection, username, passwordChars)) {
 
                     CurrentUserManager.setCurrentUser(databaseOperations.getUser(connection, username));
+                    User user = CurrentUserManager.getCurrentUser();
 
                     // Secure disposal of the password
                     Arrays.fill(passwordChars, '\u0000');
 
                     //Show a successful login message
-                    JOptionPane.showMessageDialog(LoginView.this, "Welcome user " + username,
+                    JOptionPane.showMessageDialog(LoginView.this, "Welcome " +
+                                    user.getUserForename() + " " + user.getUserSurname(),
                             "Login Successful", JOptionPane.INFORMATION_MESSAGE);
 
                     // Close the current window
