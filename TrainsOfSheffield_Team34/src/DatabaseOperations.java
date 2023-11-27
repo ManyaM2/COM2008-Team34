@@ -375,7 +375,7 @@ public class DatabaseOperations {
                     "AND ps.setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
@@ -503,7 +503,7 @@ public class DatabaseOperations {
         ResultSet resultSet = null;
         try {
             //Get all the products with the same set code
-            String sqlQuery = "SELECT c.productCode, c.typeName " +
+            String sqlQuery = "SELECT c.productCode, c.typeName, " +
                     "p.brandName, p.productName, p.retailPrice, p.gauge, p.stockLevel " +
                     "FROM Controller c, Products p, ProductsInSet ps " +
                     "WHERE p.productCode = c.productCode " +
@@ -512,7 +512,7 @@ public class DatabaseOperations {
 
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
@@ -579,7 +579,7 @@ public class DatabaseOperations {
                     "AND ps.setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {
@@ -647,7 +647,7 @@ public class DatabaseOperations {
                     "AND ps.setCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             statement.setString(1, setCode);
-            resultSet = statement.executeQuery(sqlQuery);
+            resultSet = statement.executeQuery();
 
             // Convert the resultSet into a list of products
             while (resultSet.next()) {

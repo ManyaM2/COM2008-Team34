@@ -1,8 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,8 +9,6 @@ import java.awt.event.ItemListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -329,32 +325,39 @@ public class StaffView extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String[] productType = {"Track Pack", "Locomotive", "Train Set", "Controller", "Track Piece", "Rolling Stock"};
+
+                // Make the fields
+                String[] productType = {"Track Pack", "Locomotive", "Train Set", "Controller", "Track Piece",
+                        "Rolling Stock"};
                 JComboBox<String> types = new JComboBox<>(productType);
 
                 JTextField productCode = new JTextField("");
                 JTextField brandName = new JTextField("");
                 JTextField productName = new JTextField("");
                 JTextField retailPrice = new JTextField("");
-                JTextField gauge = new JTextField("");
+                String[] gaugeTypes = {"OO", "TT", "N"};
+                JComboBox<String> gauge = new JComboBox<>(gaugeTypes);
                 JTextField stockLevel = new JTextField("");
 
+                JTextField eraCode = new JTextField("Era X");
+                JLabel ec = new JLabel("Era Code: (replace X with era)");
 
-                JTextField eraCode = new JTextField("");
-                JLabel ec = new JLabel("Era Code:");
-
-                JTextField dccCode = new JTextField("");
+                String[] dccCodes = {"Analogue","DCC-Ready","DCC-Fitted","DCC-Sound"};
+                JComboBox<String> dccCode = new JComboBox<>(dccCodes);
                 JLabel dc = new JLabel("Dcc Code:");
 
-                JTextField typeName = new JTextField("");
+                String[] cTypes = {"Analogue","Digital"};
+                JComboBox<String> typeName = new JComboBox<>(cTypes);
                 JLabel tn = new JLabel("Type Name:") ;
 
-                JTextField controllerType = new JTextField("");
+                JComboBox<String> controllerType = new JComboBox<>(cTypes);
                 JLabel ct = new JLabel("Controller Type:");
 
+                // Make the panel
                 JPanel panel = new JPanel(new GridLayout(0, 1));
                 JScrollPane scrollablePanel = new JScrollPane(panel);
 
+                // Add the fields to the panel
                 panel.add(new JLabel("Select type:"));
                 panel.add(types);
 
@@ -371,9 +374,10 @@ public class StaffView extends JFrame {
                 panel.add(new JLabel("Stock Level:"));
                 panel.add(stockLevel);
 
+                // Detect change in the 'types' combobox
                 types.addActionListener(new ActionListener() {
-                    @Override
                     public void actionPerformed(ActionEvent e) {
+                        // Update the fields based on the selected category
                         String pType = types.getSelectedItem().toString();
                         panel.remove(ec);
                         panel.remove(eraCode);
@@ -408,51 +412,96 @@ public class StaffView extends JFrame {
                     }
                 });
 
-                int result = JOptionPane.showConfirmDialog(null, scrollablePanel, "New Product Details",
-                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                // Add fields to JOption Pane
+                int result = JOptionPane.showConfirmDialog(null, scrollablePanel,
+                        "New Product Details", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                // Process field contents
                 if (result == JOptionPane.OK_OPTION) {
                     try {
-
+                        // Make a product from the generic fields
                         String pCode = productCode.getText();
                         String bName = brandName.getText();
                         String pName = productName.getText();
                         Double rPrice = Double.valueOf(retailPrice.getText());
-                        String g = gauge.getText();
-                        Integer sLevel = Integer.parseInt(stockLevel.getText());
-                        Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel);
+                        String g = gauge.getSelectedItem().toString();
+                        int sLevel = Integer.parseInt(stockLevel.getText());
+                        String typeProduct = "/";
 
-                        //Considerations for the specific types of products
-                        String eCode = eraCode.getText();
-                        String dCode = dccCode.getText();
-                        String tName = typeName.getText();
-                        String cType =controllerType.getText();
+                        if (!pCode.isBlank())
+                            typeProduct = Character.toString(pCode.charAt(0));
 
-                        String typeProduct = Character.toString(pCode.charAt(0));
+                        // Ensure all the required fields have values
+                        if (pCode.isBlank() || bName.isBlank() || pName.isBlank() || retailPrice.getText().isBlank() ||
+                                stockLevel.getText().isBlank()) {
+                            JOptionPane.showMessageDialog(panel, "Please fill in all the fields",
+                                    "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+                        } else if (((pCode.length() > 6) || (pCode.length() < 5)) || (!typeProduct.equals("R") &&
+                                !typeProduct.equals("S") && !typeProduct.equals("L") && !typeProduct.equals("C") &&
+                                !typeProduct.equals("M") && !typeProduct.equals("P"))) {
+                            JOptionPane.showMessageDialog(panel, "Please enter a valid product code",
+                                    "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+                        } else { // After valid entry of generic fields
+                            // Get the contents of the specific fields
+                            String eCode = eraCode.getText();
+                            String dCode = dccCode.getSelectedItem().toString();
+                            String tName = typeName.getSelectedItem().toString();
+                            String cType =controllerType.getSelectedItem().toString();
 
+                            if (typeProduct.equals("L")){
 
-                        if (typeProduct.equals("L")){
-                            Locomotive newLocomotive = new Locomotive(pCode,bName,g, pName,rPrice,sLevel,eCode, dCode);
-                            databaseUpdateOps.addLocomotive(connection, newLocomotive);
-                        }
-                        else if (typeProduct.equals("S")){
-                            RollingStock newRollingStock = new RollingStock(pCode,bName,g, pName,rPrice,sLevel,eCode);
-                            databaseUpdateOps.addRollingStcok(connection, newRollingStock);
-                        }
-                        else if (typeProduct.equals("C")){
-                            Controller newController = new Controller(pCode,bName,g, pName,rPrice,sLevel,tName);
-                            databaseUpdateOps.addController(connection, newController);
-                        }
-                        else if (typeProduct.equals("M")){
-                            Set newSet = new Set(pCode,bName,g, pName,rPrice,sLevel,null,cType);
-                            databaseUpdateOps.addTrainSet(connection, newSet);
-                        }
-                        else {
-                            databaseUpdateOps.addProduct(connection, newProduct);
-                        }
+                                // Ensure the era code is valid
+                                if (eCode.isBlank() || !eCode.contains("Era")){
+                                    JOptionPane.showMessageDialog(panel, "Please enter a valid era code",
+                                            "Invalid Entry", 0);
+                                } else {
+                                    Locomotive newLocomotive = new Locomotive(pCode,bName,g, pName,rPrice,sLevel,
+                                            eCode, dCode);
+                                    databaseUpdateOps.addLocomotive(connection, newLocomotive);
+                                }
+                            }
+                            else if (typeProduct.equals("S")){
+                                // Ensure the era code is valid
+                                if (eCode.isBlank() || !eCode.contains("Era")){
+                                    JOptionPane.showMessageDialog(panel, "Please enter a valid era code",
+                                            "Invalid Entry", 0);
+                                } else {
+                                    RollingStock newRollingStock = new RollingStock(pCode,bName,g, pName,rPrice,
+                                            sLevel,eCode);
+                                    databaseUpdateOps.addRollingStcok(connection, newRollingStock);
+                                }
+                            }
+                            else if (typeProduct.equals("C")){
+                                Controller newController = new Controller(pCode,bName,g, pName,rPrice,sLevel,tName);
+                                databaseUpdateOps.addController(connection, newController);
+                            }
+                            else if (typeProduct.equals("M")){
+                                // Ensure the era code is valid
+                                if (eCode.isBlank() || !eCode.contains("Era")){
+                                    JOptionPane.showMessageDialog(panel, "Please enter a valid era code",
+                                            "Invalid Entry", 0);
+                                } else {
+                                    Set newSet = new Set(pCode,bName,g, pName,rPrice,sLevel,null,cType);
+                                    newSet.setEra(eCode);
+                                    databaseUpdateOps.addTrainSet(connection, newSet);
+                                }
+                            }
+                            else if (typeProduct.equals("P")){
+                                Set newSet = new Set(pCode,bName,g, pName,rPrice,sLevel,null,null);
+                                databaseUpdateOps.addTrackPack(connection, newSet);
+                            }
+                            else {
+                                Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel);
+                                databaseUpdateOps.addProduct(connection, newProduct);
+                            }
 
+                        }
                         reloadProducts(connection, databaseOperations);
-                    } catch (Exception ex){
+                    } catch (SQLException ex) {
                         ex.printStackTrace();
+                    } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(panel, "Invalid stock level provided",
+                                    "Invalid Entry", 0);
                     }
                 } else {
                     reloadProducts(connection, databaseOperations);
@@ -523,7 +572,7 @@ public class StaffView extends JFrame {
                 JTextField stockLevel = new JTextField(String.valueOf(p.getStockLevel()));
 
                 //Considerations for Set
-                setButton = new JButton("Set Details");
+                setButton = new JButton("Add product");
                 JLabel sc = new JLabel("Add Products to Set (Optional):");
 
                 setButton.addActionListener(new ActionListener() {

@@ -524,6 +524,19 @@ public class DbUpdateOperations {
         }
     }
 
+    public void addTrackPack(Connection connection, Set trackPack) throws  SQLException{
+        try{
+            addProduct(connection, trackPack);
+            String addQuery = "INSERT INTO Sets (productCode) VALUES (?) ";
+            PreparedStatement statement = connection.prepareStatement(addQuery);
+            statement.setString(1, trackPack.getProductCode());
+            statement.executeUpdate();
+
+        }  catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void addToSet(Connection connection, String setCode, String productCode, int quantity) throws  SQLException{
         try{
