@@ -101,12 +101,12 @@ public class SignupView extends JFrame {
 
                 // Ensure there is text in all the fields
                 if (forename.isBlank() || surname.isBlank() || email.isBlank() || password.isBlank()) {
-                    JOptionPane.showMessageDialog(frame,"Update failed: Please fill in all the fields ",
+                    JOptionPane.showMessageDialog(frame,"Sign up failed: Please fill in all the fields ",
                             "Invalid Entry", 0);
                 } else {
                     // Ensure the email contains the correct characters
                     if (!email.contains("@") || !email.contains(".")){
-                        JOptionPane.showMessageDialog(frame, "Update failed: Invalid email address",
+                        JOptionPane.showMessageDialog(frame, "Sign up failed: Invalid email address",
                                 "Invalid Entry", 0);
                     } else { // Apply changes
                         List<String> roles = new ArrayList<>();
@@ -125,7 +125,7 @@ public class SignupView extends JFrame {
                         // Update user details in the session
                         CurrentUserManager.setCurrentUser(user);
 
-                        JOptionPane.showMessageDialog(frame, "Details updated");
+                        JOptionPane.showMessageDialog(frame, "Sign Up Successful");
                     }
                 }
 
