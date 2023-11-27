@@ -75,8 +75,7 @@ public class StaffView extends JFrame {
         menu.add(homeItem);
         menu.add(productsMenu);
         menu.add(ordersMenu);
-        menu.add(Box.createGlue());
-        menu.add(hiUser);
+
 
         // Display the products
         productPanel = new JPanel();
@@ -147,6 +146,7 @@ public class StaffView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield (Staff) | Home - Locomotives");
+                addButton.setVisible(true);
                 productPanel.removeAll();
                 GridLayout layout = new GridLayout(0,3);
                 layout.setHgap(5);
@@ -170,6 +170,7 @@ public class StaffView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield (Staff) | Home - Track Packs");
+                addButton.setVisible(true);
                 productPanel.removeAll();
                 GridLayout layout = new GridLayout(0,3);
                 layout.setHgap(5);
@@ -193,6 +194,7 @@ public class StaffView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield (Staff) | Home - Train Sets");
+                addButton.setVisible(true);
                 productPanel.removeAll();
                 GridLayout layout = new GridLayout(0,3);
                 layout.setHgap(5);
@@ -216,6 +218,7 @@ public class StaffView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield (Staff) | Home - Controllers");
+                addButton.setVisible(true);
                 productPanel.removeAll();
                 GridLayout layout = new GridLayout(0,3);
                 layout.setHgap(5);
@@ -239,6 +242,7 @@ public class StaffView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield (Staff) | Home - Track Pieces");
+                addButton.setVisible(true);
                 productPanel.removeAll();
                 GridLayout layout = new GridLayout(0,3);
                 layout.setHgap(5);
@@ -262,6 +266,7 @@ public class StaffView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield (Staff) | Home - Rolling Stock");
+                addButton.setVisible(true);
                 productPanel.removeAll();
                 GridLayout layout = new GridLayout(0,3);
                 layout.setHgap(5);
@@ -286,6 +291,7 @@ public class StaffView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setTitle("Trains of Sheffield (Staff) | Home");
+                addButton.setVisible(true);
                 productPanel.removeAll();
                 GridLayout layout = new GridLayout(0,3);
                 layout.setHgap(5);
@@ -711,6 +717,7 @@ public class StaffView extends JFrame {
 
     public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations, Boolean displayAll){
         setTitle("Trains of Sheffield | Profile - My Orders");
+        addButton.setVisible(false);
         productPanel.removeAll();
         BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
         productPanel.setLayout(layout);
