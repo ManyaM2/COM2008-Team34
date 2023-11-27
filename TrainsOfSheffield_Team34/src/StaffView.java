@@ -61,14 +61,18 @@ public class StaffView extends JFrame {
         JMenuItem homeItem = new JMenuItem("Home");
         homeItem.setMaximumSize(new Dimension(45, 50));
 
-        JMenuItem orderItem = new JMenuItem("View Orders");
-        orderItem.setMaximumSize((new Dimension(80,50)));
+        JMenu ordersMenu = new JMenu("Orders");
+        JMenuItem pendingOrdersItem = new JMenuItem("Unfulfilled Orders");
+        JMenuItem allOrdersItem = new JMenuItem("All Orders");
+
+        ordersMenu.add(pendingOrdersItem);
+        ordersMenu.add(allOrdersItem);
 
         menu = new JMenuBar();
         menu.add(prevItem);
         menu.add(homeItem);
         menu.add(productsMenu);
-        menu.add(orderItem);
+        menu.add(ordersMenu);
 
         // Display the products
         productPanel = new JPanel();
@@ -297,10 +301,17 @@ public class StaffView extends JFrame {
             }
         });
 
-        orderItem.addActionListener(new ActionListener() {
+        pendingOrdersItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                reloadMyOrders(connection, databaseOperations);
+                reloadMyOrders(connection, databaseOperations, false);
+            }
+        });
+
+        allOrdersItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reloadMyOrders(connection, databaseOperations, true);
             }
         });
 
@@ -694,21 +705,28 @@ public class StaffView extends JFrame {
         repaint();
     }
 
-    public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations){
+    public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations, Boolean displayAll){
         setTitle("Trains of Sheffield | Profile - My Orders");
         productPanel.removeAll();
         BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
         productPanel.setLayout(layout);
         List<Order> orders = null;
         try {
-            // Display confirmed orders
-            orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
-            orders.removeIf(n -> (n.getStatus() != OrderStatus.CONFIRMED));
-            for (int i = 0; i < orders.size(); i++) {
-                productPanel.add(getOrderPanel(orders.get(i), connection, i));
-            }
-            for (Order o : orders){
-
+            if (!displayAll){
+                // Display confirmed orders
+                orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+                orders.removeIf(n -> (n.getStatus() != OrderStatus.CONFIRMED));
+                for (int i = 0; i < orders.size(); i++) {
+                    productPanel.add(getOrderPanel(orders.get(i), connection, i));
+                }
+            } else {
+                // Display fulfilled orders
+                orders = databaseOperations.getOrders(connection, CurrentUserManager.getCurrentUser());
+                orders.removeIf(n -> (n.getStatus() != OrderStatus.FULFILLED));
+                Collections.reverse(orders);
+                for (int i = 0; i < orders.size(); i++) {
+                    productPanel.add(getOrderPanel(orders.get(i), connection, i));
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -724,77 +742,84 @@ public class StaffView extends JFrame {
 
         // Set the layout and border of the order section
         JPanel orderPanel = new JPanel();
-        GridLayout layout = new GridLayout(0,3);
-        layout.setHgap(5);
-        layout.setVgap(0);
-        orderPanel.setLayout(layout);
-        TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
-                ("Order " + o.getOrderNumber()));
-        title.setTitleJustification(TitledBorder.LEFT);
-        orderPanel.setBorder(title);
+        JButton orderButton = new JButton("Order " + o.getOrderNumber() + " | Date: " + o.getDateMade());
+        JPanel orderButtonPanel = new JPanel();
+        orderButtonPanel.add(orderButton);
+        orderPanel.add(orderButtonPanel);
 
-        // Display order metadata
-        JPanel metadataPanel = new JPanel();
-        metadataPanel.setLayout(new BoxLayout(metadataPanel, BoxLayout.Y_AXIS));
-        JTextArea orderMetadataDisplay = new JTextArea(10, 20);
-        orderMetadataDisplay.setMaximumSize(new Dimension(250, 80));
-        orderMetadataDisplay.setMinimumSize(new Dimension(200, 80));
-        orderMetadataDisplay.setText(" Status: " + o.getStatus() + " | Date: " + o.getDateMade() + "\n " +
-                currentUser.getUserForename() + " " + currentUser.getUserSurname() + "\n " +
-                currentUser.getUserEmail() + "\n\n " + currentUser.getAddress(connection).toString() +
-                "\n\n Total cost: £" + moneyFormat.format(o.totalCost(connection)));
-        orderMetadataDisplay.setEditable(false);
-        metadataPanel.add(orderMetadataDisplay);
-
-        JPanel buttonPanel = new JPanel();
-
-        // Add a button to confirm the order
-        JButton confirmButton = new JButton("Fulfill order");
-        confirmButton.setMaximumSize(new Dimension(100,30));
-        confirmButton.addActionListener(new ActionListener() {
+        orderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (updateStockLevel(connection, o)){
-                    o.setStatus(connection, OrderStatus.FULFILLED);
-                } else {
-                    JOptionPane.showMessageDialog(orderPanel,"Not enough stock | Please decline order ",
-                            "Can't fullfil", 0);
-                }
-                JOptionPane.showMessageDialog(confirmButton, "Order fulfilled");
-                reloadMyOrders(connection, dbOps);
-            }
-        });
+                // Display order metadata
+                JPanel newOrderPanel = new JPanel();
+                JPanel metadataPanel = new JPanel();
+                metadataPanel.setLayout(new BoxLayout(metadataPanel, BoxLayout.Y_AXIS));
+                JTextArea orderMetadataDisplay = new JTextArea(10, 20);
+                orderMetadataDisplay.setMaximumSize(new Dimension(250, 80));
+                orderMetadataDisplay.setMinimumSize(new Dimension(200, 80));
+                orderMetadataDisplay.setText(" Status: " + o.getStatus() + " | Date: " + o.getDateMade() + "\n " +
+                        currentUser.getUserForename() + " " + currentUser.getUserSurname() + "\n " +
+                        currentUser.getUserEmail() + "\n\n " + currentUser.getAddress(connection).toString() +
+                        "\n\n Total cost: £" + moneyFormat.format(o.totalCost(connection)));
+                orderMetadataDisplay.setEditable(false);
+                metadataPanel.add(orderMetadataDisplay);
 
-        JButton deleteButton = new JButton("Decline order");
-        deleteButton.setMaximumSize(new Dimension(100,30));
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //Delete order
-                for (OrderLine ol : o.getOrderLines()) {
-                    try {
-                        dbUpdateOps.removeOrderLine(connection, ol);
-                        dbUpdateOps.removeOrder(connection, o);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
+                JPanel buttonPanel = new JPanel();
+
+                // Add a button to confirm the order
+                if (o.getStatus() == OrderStatus.CONFIRMED){
+                    JButton fulfillButton = new JButton("Fulfill order");
+                    fulfillButton.setMaximumSize(new Dimension(100,30));
+                    fulfillButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (updateStockLevel(connection, o)){
+                                o.setStatus(connection, OrderStatus.FULFILLED);
+                            } else {
+                                JOptionPane.showMessageDialog(newOrderPanel,"Order Blocked | Please decline order ",
+                                        "Can't fullfil", 0);
+                            }
+                            JOptionPane.showMessageDialog(fulfillButton, "Order fulfilled");
+                            reloadMyOrders(connection, dbOps, false);
+                        }
+                    });
+
+                    JButton deleteButton = new JButton("Delete order");
+                    deleteButton.setMaximumSize(new Dimension(100,30));
+                    deleteButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            //Delete order
+                            for (OrderLine ol : o.getOrderLines()) {
+                                try {
+                                    dbUpdateOps.removeOrderLine(connection, ol);
+                                    dbUpdateOps.removeOrder(connection, o);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                            JOptionPane.showMessageDialog(fulfillButton, "Order deleted");
+                            reloadMyOrders(connection, dbOps, false);
+                        }
+                    });
+
+                    if (counter == 0) {
+                        buttonPanel.add(fulfillButton);
+                        buttonPanel.add(deleteButton);
                     }
+                    metadataPanel.add(buttonPanel);
                 }
-                JOptionPane.showMessageDialog(confirmButton, "Order deleted");
-                reloadMyOrders(connection, dbOps);
+
+                metadataPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+                newOrderPanel.add(metadataPanel);
+
+                // Add the products to the order section
+                for (int i = 0; i < o.getOrderLines().size(); i++)
+                    newOrderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
+
+                JOptionPane.showMessageDialog(null, newOrderPanel, "Select Quantity", 1);
             }
         });
-
-        if (counter == 0) {
-            buttonPanel.add(confirmButton);
-            buttonPanel.add(deleteButton);
-        }
-        metadataPanel.add(buttonPanel);
-        metadataPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-        orderPanel.add(metadataPanel);
-
-        // Add the products to the order section
-        for (int i = 0; i < o.getOrderLines().size(); i++)
-            orderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
 
         return orderPanel;
     }

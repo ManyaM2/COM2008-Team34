@@ -357,63 +357,69 @@ public class DefaultView extends JFrame {
         DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
         User currentUser = CurrentUserManager.getCurrentUser();
 
-        // Set the layout and border of the order section
         JPanel orderPanel = new JPanel();
-        GridLayout layout = new GridLayout(0,3);
-        layout.setHgap(5);
-        layout.setVgap(0);
-        orderPanel.setLayout(layout);
-        TitledBorder title = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
-                ("Order " + o.getOrderNumber()));
-        title.setTitleJustification(TitledBorder.LEFT);
-        orderPanel.setBorder(title);
+        JButton orderButton = new JButton("Order " + o.getOrderNumber() + " | Date: " + o.getDateMade());
+        JPanel orderButtonPanel = new JPanel();
+        orderButtonPanel.add(orderButton);
+        orderPanel.add(orderButtonPanel);
 
-        // Display order metadata
-        JPanel metadataPanel = new JPanel();
-        metadataPanel.setLayout(new BoxLayout(metadataPanel, BoxLayout.Y_AXIS));
-        JTextArea orderMetadataDisplay = new JTextArea(10, 20);
-        orderMetadataDisplay.setMaximumSize(new Dimension(250, 80));
-        orderMetadataDisplay.setMinimumSize(new Dimension(200, 80));
-        orderMetadataDisplay.setText(" Status: " + o.getStatus() + " | Date: " + o.getDateMade() + "\n " +
-                currentUser.getUserForename() + " " + currentUser.getUserSurname() + "\n " +
-                currentUser.getUserEmail() + "\n\n " + currentUser.getAddress(connection).toString() +
-                "\n\n Total cost: £" + moneyFormat.format(o.totalCost(connection)));
-        orderMetadataDisplay.setEditable(false);
-        metadataPanel.add(orderMetadataDisplay);
+        orderButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Display order metadata
+                JPanel newOrderPanel = new JPanel();
+                GridLayout layout = new GridLayout(0,3);
+                layout.setHgap(5);
+                layout.setVgap(0);
+                newOrderPanel.setLayout(layout);
+                JPanel metadataPanel = new JPanel();
+                metadataPanel.setLayout(new BoxLayout(metadataPanel, BoxLayout.Y_AXIS));
+                JTextArea orderMetadataDisplay = new JTextArea(10, 20);
+                orderMetadataDisplay.setMaximumSize(new Dimension(250, 80));
+                orderMetadataDisplay.setMinimumSize(new Dimension(200, 80));
+                orderMetadataDisplay.setText(" Status: " + o.getStatus() + " | Date: " + o.getDateMade() + "\n " +
+                        currentUser.getUserForename() + " " + currentUser.getUserSurname() + "\n " +
+                        currentUser.getUserEmail() + "\n\n " + currentUser.getAddress(connection).toString() +
+                        "\n\n Total cost: £" + moneyFormat.format(o.totalCost(connection)));
+                orderMetadataDisplay.setEditable(false);
+                metadataPanel.add(orderMetadataDisplay);
 
-        JPanel buttonPanel = new JPanel();
-        // Add a button to confirm the order
-        if (o.getStatus() == OrderStatus.PENDING){
-            JButton confirmButton = new JButton("Confirm order");
-            confirmButton.setMaximumSize(new Dimension(100,30));
-            confirmButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+                JPanel buttonPanel = new JPanel();
+                // Add a button to confirm the order
+                if (o.getStatus() == OrderStatus.PENDING){
+                    JButton confirmButton = new JButton("Confirm order");
+                    confirmButton.setMaximumSize(new Dimension(100,30));
+                    confirmButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
 
-                    try {
-                        if (!dbOps.checkIfConfirmed(connection))
-                            addBankDetails(connection, o, true);
-                        else {
-                            o.setStatus(connection, OrderStatus.CONFIRMED);
-                            JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
+                            try {
+                                if (!dbOps.checkIfConfirmed(connection))
+                                    addBankDetails(connection, o, true);
+                                else {
+                                    o.setStatus(connection, OrderStatus.CONFIRMED);
+                                    JOptionPane.showMessageDialog(confirmButton, "Order confirmed");
+                                }
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            reloadMyOrders(connection, dbOps);
                         }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    reloadMyOrders(connection, dbOps);
+                    });
+                    buttonPanel.add(confirmButton);
                 }
-            });
+                metadataPanel.add(buttonPanel);
+                metadataPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+                newOrderPanel.add(metadataPanel);
 
-            buttonPanel.add(confirmButton);
-        }
-        metadataPanel.add(buttonPanel);
-        metadataPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-        orderPanel.add(metadataPanel);
+                // Add the products to the order section
+                for (int i = 0; i < o.getOrderLines().size(); i++)
+                    newOrderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
 
-        // Add the products to the order section
-        for (int i = 0; i < o.getOrderLines().size(); i++)
-            orderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
-
+                JOptionPane.showMessageDialog(null, newOrderPanel, "Select Quantity",
+                        1);
+            }
+        });
         return orderPanel;
     }
 
@@ -500,8 +506,7 @@ public class DefaultView extends JFrame {
     public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations){
         setTitle("Trains of Sheffield | Profile - My Orders");
         productPanel.removeAll();
-        BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
-        productPanel.setLayout(layout);
+        productPanel.setLayout(new BoxLayout(productPanel, BoxLayout.Y_AXIS));
         List<Order> orders = null;
         try {
             // Display pending orders
