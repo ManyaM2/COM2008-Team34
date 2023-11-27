@@ -669,6 +669,45 @@ public class DatabaseOperations {
         return rollingStock;
     }
 
+    public List<String> getSetCode(Connection connection, Product product) throws SQLException {
+        List<Product> products = new ArrayList<>();
+        List<String> setCodes = new ArrayList<>();
+        try {
+            String sqlQuery = "SELECT setCode FROM ProductsInSet WHERE productCode = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setString(1, product.getProductCode());
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                setCodes.add(resultSet.getString("setCode"));
+            }
+            resultSet.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return setCodes;
+    }
+
+    public int getSetQuantity(Connection connection, Product product, String setCode) throws SQLException {
+        int quantity = 0;
+        try {
+            String sqlQuery = "SELECT quantity FROM ProductsInSet WHERE setCode = ? AND productCode = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setString(1, setCode);
+            statement.setString(2, product.getProductCode());
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                quantity = resultSet.getInt("quantity");
+            }
+            resultSet.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return quantity;
+    }
 
     /**
      * Get a list of integers representing the quanity of products in a set
@@ -721,6 +760,8 @@ public class DatabaseOperations {
         }
         return haveConfirmed;
     }
+
+
 
     /**
      * Verifies the login credentials of a user.

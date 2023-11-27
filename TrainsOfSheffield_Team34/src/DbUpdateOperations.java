@@ -407,7 +407,7 @@ public class DbUpdateOperations {
     public void editRollingStcok(Connection connection, RollingStock rollingStock) throws  SQLException{
         try{
             editProductDetails(connection, rollingStock);
-            String addQuery = "UPDATE Rolling Stock SET eraCode = ? ";
+            String addQuery = "UPDATE RollingStock SET eraCode = ? ";
             PreparedStatement statement = connection.prepareStatement(addQuery);
             statement.setString(1, rollingStock.getEraCode());
             statement.executeUpdate();
@@ -420,7 +420,7 @@ public class DbUpdateOperations {
     public void editTrainSet(Connection connection, Set trainSet) throws  SQLException{
         try{
             editProductDetails(connection, trainSet);
-            String addQuery = "UPDATE Rolling Stock SET eraCode = ?, controllerType = ? ";
+            String addQuery = "UPDATE Sets SET eraCode = ?, controllerType = ? ";
             PreparedStatement statement = connection.prepareStatement(addQuery);
             statement.setString(1, trainSet.getEra());
             statement.setString(2, trainSet.getControllerType());
@@ -484,7 +484,7 @@ public class DbUpdateOperations {
     public void addController(Connection connection, Controller controller) throws  SQLException{
         try{
             addProduct(connection, controller);
-            String addQuery = "INSERT INTO Controller(productCode, typeName) VALUES (?, ?) ";
+            String addQuery = "INSERT INTO Controller (productCode, typeName) VALUES (?, ?) ";
             PreparedStatement statement = connection.prepareStatement(addQuery);
             statement.setString(1, controller.getProductCode());
             statement.setString(2, controller.getTypeName());
@@ -498,7 +498,7 @@ public class DbUpdateOperations {
     public void addRollingStcok(Connection connection, RollingStock rollingStock) throws  SQLException{
         try{
             addProduct(connection, rollingStock);
-            String addQuery = "INSERT INTO Rolling Stock (productCode, eraCode) VALUES (?, ?) ";
+            String addQuery = "INSERT INTO RollingStock (productCode, eraCode) VALUES (?, ?) ";
             PreparedStatement statement = connection.prepareStatement(addQuery);
             statement.setString(1, rollingStock.getProductCode());
             statement.setString(2, rollingStock.getEraCode());
@@ -512,7 +512,7 @@ public class DbUpdateOperations {
     public void addTrainSet(Connection connection, Set trainSet) throws  SQLException{
         try{
             addProduct(connection, trainSet);
-            String addQuery = "INSERT INTO Rolling Stock (productCode, eraCode, controllerType) VALUES (?, ?, ?) ";
+            String addQuery = "INSERT INTO Sets (productCode, eraCode, controllerType) VALUES (?, ?, ?) ";
             PreparedStatement statement = connection.prepareStatement(addQuery);
             statement.setString(1, trainSet.getProductCode());
             statement.setString(2, trainSet.getEra());
@@ -524,19 +524,38 @@ public class DbUpdateOperations {
         }
     }
 
-    public void addToSet(Connection connection, Product product, String setCode) throws  SQLException{
+
+    public void addToSet(Connection connection, String setCode, String productCode, int quantity) throws  SQLException{
         try{
+            //Checking product code existence
             String sqlQuery = "SELECT productCode FROM Products WHERE productCode = ?";
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
-            statement.setString(1, setCode);
+            statement.setString(1, productCode);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()){
-                String newQuery = "INSERT INTO ProductsInSet (productCode, setCode, quantity) VALUES (?, ?, ?)";
-                PreparedStatement newStatement = connection.prepareStatement(newQuery);
-                newStatement.setString(1, product.getProductCode());
-                newStatement.setString(2, setCode);
-                newStatement.setInt(3, 1);
-                newStatement.executeUpdate();
+                String existQuery = "SELECT productCode FROM ProductsInSet WHERE productCode = ? AND setCode = ?";
+                PreparedStatement existStatement = connection.prepareStatement(existQuery);
+                existStatement.setString(1, productCode);
+                existStatement.setString(2, setCode);
+                ResultSet existSet = existStatement.executeQuery();
+
+                //If exits in set update quantity
+                if (existSet.next()){
+                    String updateQuery = "UPDATE ProductsInSet SET quantity = ? WHERE productCode = ? AND setCode =?";
+                    PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                    updateStatement.setInt(1, quantity);
+                    updateStatement.setString(2, productCode);
+                    updateStatement.setString(3, setCode);
+                    updateStatement.executeUpdate();
+                }
+                else {
+                    String newQuery = "INSERT INTO ProductsInSet (productCode, setCode, quantity) VALUES (?, ?, ?)";
+                    PreparedStatement newStatement = connection.prepareStatement(newQuery);
+                    newStatement.setString(1, productCode);
+                    newStatement.setString(2, setCode);
+                    newStatement.setInt(3, quantity);
+                    newStatement.executeUpdate();
+                }
             }
         }  catch (Exception e) {
             e.printStackTrace();

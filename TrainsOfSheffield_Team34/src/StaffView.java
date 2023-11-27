@@ -24,6 +24,7 @@ public class StaffView extends JFrame {
     private JButton deleteButton;
     private JButton addButton;
     private JPanel productPanel;
+    private JButton setButton;
     private JPanel orderPanel;
     private JTextArea productDisplay;
     private JTextArea orderDisplay;
@@ -337,7 +338,7 @@ public class StaffView extends JFrame {
                 JTextField retailPrice = new JTextField("");
                 JTextField gauge = new JTextField("");
                 JTextField stockLevel = new JTextField("");
-                JTextField setCode = new JTextField("");
+
 
                 JTextField eraCode = new JTextField("");
                 JLabel ec = new JLabel("Era Code:");
@@ -369,8 +370,6 @@ public class StaffView extends JFrame {
                 panel.add(gauge);
                 panel.add(new JLabel("Stock Level:"));
                 panel.add(stockLevel);
-                panel.add(new JLabel("Set Code (Optional):"));
-                panel.add(setCode);
 
                 types.addActionListener(new ActionListener() {
                     @Override
@@ -413,6 +412,7 @@ public class StaffView extends JFrame {
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                 if (result == JOptionPane.OK_OPTION) {
                     try {
+
                         String pCode = productCode.getText();
                         String bName = brandName.getText();
                         String pName = productName.getText();
@@ -422,7 +422,6 @@ public class StaffView extends JFrame {
                         Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel);
 
                         //Considerations for the specific types of products
-                        String sCode = setCode.getText();
                         String eCode = eraCode.getText();
                         String dCode = dccCode.getText();
                         String tName = typeName.getText();
@@ -450,9 +449,7 @@ public class StaffView extends JFrame {
                         else {
                             databaseUpdateOps.addProduct(connection, newProduct);
                         }
-                        if (!sCode.isBlank()){
-                            databaseUpdateOps.addToSet(connection, newProduct, sCode);
-                        }
+
                         reloadProducts(connection, databaseOperations);
                     } catch (Exception ex){
                         ex.printStackTrace();
@@ -463,9 +460,7 @@ public class StaffView extends JFrame {
             }
         });
     }
-
-
-
+    
     /**
      * Add the metadata of each product onto the part of the screen they will be displayed
      * @param p the product being displayed
@@ -527,9 +522,52 @@ public class StaffView extends JFrame {
                 JTextField gauge = new JTextField(p.getGauge());
                 JTextField stockLevel = new JTextField(String.valueOf(p.getStockLevel()));
 
-                JTextField setCode = new JTextField();
-                JLabel sc = new JLabel("Add to Set (Optional):");
+                //Considerations for Set
+                setButton = new JButton("Set Details");
+                JLabel sc = new JLabel("Add Products to Set (Optional):");
 
+                setButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JTextField productCodeField = new JTextField();
+                        JLabel pc = new JLabel("Product Code:");
+                       
+                        JTextField quantityField = new JTextField();
+                        JLabel qt = new JLabel("Product Quantity");
+                        JPanel setPanel = new JPanel(new GridLayout(0, 1));
+                        setPanel.add(pc);
+                        setPanel.add(productCodeField);
+                        setPanel.add(qt);
+                        setPanel.add(quantityField);
+
+                        int setResult = JOptionPane.showConfirmDialog(null, setPanel, "Set details",
+                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                        if (setResult == JOptionPane.OK_OPTION) {
+                            try {
+                                if (quantityField.getText().isBlank() || productCodeField.getText().isBlank()) {
+                                    JOptionPane.showMessageDialog(setPanel, "Please fill fields",
+                                            "Invalid Entry", 0);
+                                }
+                                else {
+                                    int quantity = Integer.parseInt(quantityField.getText());
+                                    String pCode = productCodeField.getText();
+                                        try{
+                                            if (p instanceof Set)
+                                                dbUpdateOps.addToSet(connection, p.getProductCode(), pCode, quantity);
+                                        } catch (Exception ee) {
+                                            ee.printStackTrace();
+                                        }
+                                }
+                            }
+                            catch (NumberFormatException ex) {
+                                JOptionPane.showMessageDialog(setPanel, "Invalid quantity provided",
+                                        "Invalid Entry", 0);
+                            }
+                        }
+                    }
+                });
+
+                //For editing additional things in the specific category
                 JTextField locEraCode = null;
                 if (p instanceof Locomotive) {
                     locEraCode = new JTextField(((Locomotive)p).getEraCode());
@@ -560,9 +598,6 @@ public class StaffView extends JFrame {
                 }
                 JLabel ct = new JLabel("Controller Type:");
 
-                JTextField quantity =  new JTextField();
-                JLabel qt = new JLabel("Product Quantity");
-
                 JPanel panel = new JPanel(new GridLayout(0, 1));
 
                 panel.add(new JLabel("Product Code"));
@@ -577,8 +612,6 @@ public class StaffView extends JFrame {
                 panel.add(gauge);
                 panel.add(new JLabel("Stock Level:"));
                 panel.add(stockLevel);
-                panel.add(sc);
-                panel.add(setCode);
 
                 switch(typeProduct){
                     case "L":
@@ -600,6 +633,12 @@ public class StaffView extends JFrame {
                         panel.add(setEraCode);
                         panel.add(ct);
                         panel.add(controllerType);
+                        panel.add(sc);
+                        panel.add(setButton);
+                        break;
+                    case "P":
+                        panel.add(sc);
+                        panel.add(setButton);
                         break;
                 }
 
@@ -617,16 +656,22 @@ public class StaffView extends JFrame {
                         p.setBrandName(bName);
                         p.setRetailPrice(rPrice);
                         p.setGauge(g);
-                        p.setStockLevel(sLevel);
+                        if (sLevel < p.getStockLevel()){
+                            JOptionPane.showMessageDialog(panel, "Stock Level low, Please increase from!" +
+                                            p.getStockLevel(), "Invalid Entry", 0);
+                        }
+                        else {
+                            p.setStockLevel(sLevel);
+                        }
+
                         dbUpdateOps.editProductDetails(connection, p);
 
                         //Considerations for the specific types of products
-                        String sCode = setCode.getText();
-
                         String leCode = null;
                         if (locEraCode != null) {
                             leCode = locEraCode.getText();
                         }
+
                         String reCode = null;
                         if (rolEraCode != null) {
                             reCode = rolEraCode.getText();
@@ -643,8 +688,6 @@ public class StaffView extends JFrame {
                         if (controllerType != null) {
                             cType = controllerType.getText();
                         }
-
-                        //Integer qNumber = Integer.parseInt(quantity.getText());
 
                         if (p instanceof Locomotive) {
                             ((Locomotive)p).setEraCode(leCode);
@@ -667,16 +710,19 @@ public class StaffView extends JFrame {
                         else {
                             dbUpdateOps.editProductDetails(connection, p);
                         }
-                        /*if (!sCode.isBlank()){
-                            dbUpdateOps.editToSet(connection,sCode, qNumber);
-                        }*/
+
                         reloadProducts(connection, dbOps);
-                    } catch (Exception ex){
+                    } catch (SQLException ex){
                         ex.printStackTrace();
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(panel, "Invalid details provided",
+                                "Invalid Entry", 0);
+
                     }
                 } else {
                     reloadProducts(connection, dbOps);
                 }
+
 
             }
         });
@@ -715,9 +761,13 @@ public class StaffView extends JFrame {
         repaint();
     }
 
-    public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations, Boolean displayAll){
-        setTitle("Trains of Sheffield | Profile - My Orders");
+    public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations, Boolean displayAll) {
+        setTitle("Trains of Sheffield (Staff) | Orders");
         addButton.setVisible(false);
+    }
+    public void reloadMyOrders(Connection connection, DatabaseOperations databaseOperations, boolean displayAll){
+        setTitle("Trains of Sheffield (Staff) | Orders");
+
         productPanel.removeAll();
         BoxLayout layout = new BoxLayout(productPanel, BoxLayout.Y_AXIS);
         productPanel.setLayout(layout);
