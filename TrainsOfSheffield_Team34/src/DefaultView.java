@@ -323,7 +323,6 @@ public class DefaultView extends JFrame {
         productDisplay.setMinimumSize(new Dimension(200, 80));
         productDisplay.setText("\n " + p.getProductCode() + " | " + p.getProductName() + "\n " + p.getBrandName() +
                 "\n " + p.getGauge() + " Gauge (" + p.getScale() + " Scale) \n ");
-        char productType = p.getProductCode().charAt(0);
 
         // Display different data depending on the type of the product
         if (p instanceof Locomotive)

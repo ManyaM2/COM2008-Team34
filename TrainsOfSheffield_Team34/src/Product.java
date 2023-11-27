@@ -1,3 +1,5 @@
+import java.sql.Connection;
+
 public class Product {
     private String brandName;
     private String gauge;
@@ -24,11 +26,9 @@ public class Product {
         return scale;
     }
 
-    public void setProductCode(String fn){ productCode = fn; }
     public void setProductName(String fn){ productName = fn; }
     public void setBrandName(String e){ brandName = e; }
     public void setGauge(String g) { gauge = g;}
-
     public void setRetailPrice(double rPrice) { retailPrice = rPrice;}
     public void setStockLevel(int sLevel) {stockLevel = sLevel;}
 
@@ -57,4 +57,5 @@ public class Product {
             return true;
         return false;
     }
+
 }
