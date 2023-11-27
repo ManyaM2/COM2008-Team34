@@ -27,14 +27,16 @@ public class DbUpdateOperations {
         }
     }
 
-    public void addOrderLine(Connection connection, Product p) throws SQLException{
+    public OrderLine addOrderLine(Connection connection, OrderLine o) throws SQLException{
+        OrderLine orderLine = o;
         ResultSet resultSet = null;
+        int orderNumber = -1;
+        Product p = o.getProduct(connection);
         try {
             resultSet = getPendingOrders(connection);
 
             //If there is a pending order, add an orderline to the order
             if (resultSet.next()){
-                int orderNumber = -1;
                 orderNumber = resultSet.getInt("orderNumber");
 
                 String updateQuery = "INSERT INTO OrderLine (orderNumber, productCode, productQuantity, lineCost) " +
@@ -56,7 +58,6 @@ public class DbUpdateOperations {
 
                 resultSet = getPendingOrders(connection);
 
-                int orderNumber = -1;
                 while (resultSet.next())
                     orderNumber = resultSet.getInt("orderNumber");
 
@@ -69,9 +70,20 @@ public class DbUpdateOperations {
                 updateStatement.setDouble(4, p.getRetailPrice());
                 updateStatement.executeUpdate();
             }
+            String sqlQuery = "SELECT lineNumber FROM OrderLine WHERE orderNumber = ? AND productCode = ?";
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            statement.setInt(1, orderNumber);
+            statement.setString(2, p.getProductCode());
+            resultSet = statement.executeQuery();
+
+            if (resultSet.next())
+                orderLine.setLineNumber(resultSet.getInt("lineNumber"));
+
+            resultSet.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return orderLine;
     }
 
     public void removeOrderLine(Connection connection, OrderLine ol) throws SQLException{

@@ -14,6 +14,11 @@ public class OrderLine {
         this.productCode = productCode;
     }
 
+    public OrderLine(int productQuantity, String productCode) {
+        this.productQuantity = productQuantity;
+        this.productCode = productCode;
+    }
+
     /**
      * Get the product described by the orderline
      * @param connection
@@ -47,6 +52,8 @@ public class OrderLine {
     }
 
     public String getProductCode(){ return  productCode; }
+
+    public void setLineNumber(int ln){ lineNumber = ln; }
 
     public double lineCost(Connection connection) {
         return productQuantity * getProduct(connection).getRetailPrice();
