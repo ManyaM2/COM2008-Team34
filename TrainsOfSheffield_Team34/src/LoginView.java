@@ -91,16 +91,32 @@ public class LoginView extends JFrame {
 
                 } else {
                     // Show an unsuccessful login message
-                    JOptionPane.showConfirmDialog(LoginView.this,
-                            "Invalid username or password. Please try again.",
-                            "Login Failed", JOptionPane.INFORMATION_MESSAGE);
+                    int option = JOptionPane.showConfirmDialog(LoginView.this,
+                            "Invalid username or password. Do you want to create a new account?",
+                            "Login Failed", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-                    // Secure disposal of the password
-                    Arrays.fill(passwordChars, '\u0000');
+                    // Redirect to the sign-up screen
+                    if (option == JOptionPane.YES_OPTION) {
 
+                        // Close the current window
+                        dispose();
+
+                        SignupView signupView = null;
+                        try {
+                            signupView = new SignupView(connection);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        signupView.setVisible(true);
+
+                    } else {
+                        // Secure disposal of the password
+                        Arrays.fill(passwordChars, '\u0000');
+                    }
                 }
                 // Secure disposal of the password
                 Arrays.fill(passwordChars, '\u0000');
+
             }
         });
 
