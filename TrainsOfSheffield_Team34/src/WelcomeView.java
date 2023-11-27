@@ -47,6 +47,7 @@ public class WelcomeView extends JFrame {
         loginMessage.setBounds (240, 115, 400, 25);
         signupMessage.setBounds (240, 200, 400, 25);
 
+        // Create an ActionListener for the login button
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -63,6 +64,7 @@ public class WelcomeView extends JFrame {
             }
         });
 
+        // Create an ActionListener for the signup button
         signupButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -120,7 +120,7 @@ public class LoginView extends JFrame {
             }
         });
 
-        // Create an ActionListener for the cancel button
+        // Create an ActionListener for the clear button
         clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
