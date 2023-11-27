@@ -8,15 +8,15 @@ public class Main {
 
         // Execute the Swing GUI application on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {
-            LoginView loginView = null;
+            WelcomeView welcomeView = null;
             try {
                 // Open a database connection
                 databaseConnectionHandler.openConnection();
 
                 // Create and initialize the LoanTableDisplay view using the database connection
-                loginView = new LoginView(databaseConnectionHandler.getConnection());
+                welcomeView = new WelcomeView(databaseConnectionHandler.getConnection());
                 //staffView = new StaffView(databaseConnectionHandler.getConnection(), testUser);
-                loginView.setVisible(true);
+                welcomeView.setVisible(true);
 
             } catch (Throwable t) {
                 // Close connection if database crashes.

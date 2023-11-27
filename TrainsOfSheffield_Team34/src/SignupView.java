@@ -144,20 +144,20 @@ public class SignupView extends JFrame {
             }
         });
 
-        // Create an ActionListener for the back button
+        // Create an ActionListener for the back button to go to the Welcome page
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Close the current window
                 dispose();
 
-                LoginView loginView = null;
+                WelcomeView welcomeView = null;
                 try {
-                    loginView = new LoginView(connection);
+                    welcomeView = new WelcomeView(connection);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
-                loginView.setVisible(true);
+                welcomeView.setVisible(true);
             }
         });
 
