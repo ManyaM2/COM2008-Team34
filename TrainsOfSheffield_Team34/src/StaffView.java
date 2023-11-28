@@ -4,8 +4,6 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -484,11 +482,13 @@ public class StaffView extends JFrame {
                                     Set newSet = new Set(pCode,bName,g, pName,rPrice,sLevel,null,cType);
                                     newSet.setEra(eCode);
                                     databaseUpdateOps.addTrainSet(connection, newSet);
+                                    addProductToSet(connection, newSet);
                                 }
                             }
                             else if (typeProduct.equals("P")){
                                 Set newSet = new Set(pCode,bName,g, pName,rPrice,sLevel,null,null);
                                 databaseUpdateOps.addTrackPack(connection, newSet);
+                                addProductToSet(connection, newSet);
                             }
                             else {
                                 Product newProduct = new Product(pCode, bName, pName, rPrice, g, sLevel);
@@ -508,6 +508,43 @@ public class StaffView extends JFrame {
                 }
             }
         });
+    }
+
+    public void addProductToSet(Connection connection, Product p){
+        DbUpdateOperations dbUpdateOps = new DbUpdateOperations();
+        JTextField productCodeField = new JTextField();
+        JLabel pc = new JLabel("Product Code:");
+
+        JTextField quantityField = new JTextField();
+        JLabel qt = new JLabel("Product Quantity");
+        JPanel setPanel = new JPanel(new GridLayout(0, 1));
+        setPanel.add(pc);
+        setPanel.add(productCodeField);
+        setPanel.add(qt);
+        setPanel.add(quantityField);
+
+        int setResult = JOptionPane.showConfirmDialog(null, setPanel, "Add Products to Set",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (setResult == JOptionPane.OK_OPTION) {
+            try {
+                if (quantityField.getText().isBlank() || productCodeField.getText().isBlank()) {
+                    JOptionPane.showMessageDialog(setPanel, "Please fill fields",
+                            "Invalid Entry", 0);
+                } else {
+                    int quantity = Integer.parseInt(quantityField.getText());
+                    String pCode = productCodeField.getText();
+                    try {
+                        if (p instanceof Set)
+                            dbUpdateOps.addToSet(connection, p.getProductCode(), pCode, quantity);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(setPanel, "Invalid quantity provided",
+                        "Invalid Entry", 0);
+            }
+        }
     }
     
     /**
@@ -578,41 +615,7 @@ public class StaffView extends JFrame {
                 setButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        JTextField productCodeField = new JTextField();
-                        JLabel pc = new JLabel("Product Code:");
-                       
-                        JTextField quantityField = new JTextField();
-                        JLabel qt = new JLabel("Product Quantity");
-                        JPanel setPanel = new JPanel(new GridLayout(0, 1));
-                        setPanel.add(pc);
-                        setPanel.add(productCodeField);
-                        setPanel.add(qt);
-                        setPanel.add(quantityField);
-
-                        int setResult = JOptionPane.showConfirmDialog(null, setPanel, "Set details",
-                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-                        if (setResult == JOptionPane.OK_OPTION) {
-                            try {
-                                if (quantityField.getText().isBlank() || productCodeField.getText().isBlank()) {
-                                    JOptionPane.showMessageDialog(setPanel, "Please fill fields",
-                                            "Invalid Entry", 0);
-                                }
-                                else {
-                                    int quantity = Integer.parseInt(quantityField.getText());
-                                    String pCode = productCodeField.getText();
-                                        try{
-                                            if (p instanceof Set)
-                                                dbUpdateOps.addToSet(connection, p.getProductCode(), pCode, quantity);
-                                        } catch (Exception ee) {
-                                            ee.printStackTrace();
-                                        }
-                                }
-                            }
-                            catch (NumberFormatException ex) {
-                                JOptionPane.showMessageDialog(setPanel, "Invalid quantity provided",
-                                        "Invalid Entry", 0);
-                            }
-                        }
+                        addProductToSet(connection, p);
                     }
                 });
 

@@ -4,11 +4,8 @@ import java.util.List;
 
 public class Set extends Product{
     private List<Product> productCodes;
-    private int setID;
     private String controllerType;
-
     private String eraCode;
-    public int getSetID(){return setID;}
     public String getControllerType(){return controllerType;}
     public List<Product> getProductCodes(){ return productCodes; }
     public void setControllerType(String cType){ controllerType = cType; }

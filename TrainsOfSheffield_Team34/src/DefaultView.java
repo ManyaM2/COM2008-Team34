@@ -585,7 +585,7 @@ public class DefaultView extends JFrame {
                 String secCode = securityCode.getText();
                 String expiryDate = expiryMonth.getSelectedItem() + "/" + expiryYear.getSelectedItem();
 
-                // Ensure the details entered are of the correct length
+                // Ensure the details entered are of the correct length and all the fields have values
                 if (cNum.length() != 16 || secCode.length() != 3 || cName.isEmpty() || cHolderName.isEmpty()){
                     JOptionPane.showMessageDialog(panel,"Invalid details provided ",
                             "Invalid Entry", 0);

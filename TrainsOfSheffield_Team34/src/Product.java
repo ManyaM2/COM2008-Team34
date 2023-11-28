@@ -10,9 +10,6 @@ public class Product {
     private String productCode;
     private double retailPrice;
     private int stockLevel;
-    private List<String> setCode;
-    private int quantity;
-
 
     public String getBrandName() { return brandName; }
     public String getGauge() { return gauge; }
@@ -21,26 +18,6 @@ public class Product {
     public double getRetailPrice() { return retailPrice; }
     public int getStockLevel() { return stockLevel; }
 
-    public List<String> getSetCode(Connection connection) {
-        DatabaseOperations dbOps = new DatabaseOperations();
-        List<String> setCode = new ArrayList<>();
-        try {
-            setCode = dbOps.getSetCode(connection, this);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return setCode;
-    }
-    public int getSetQuantity(Connection connection, String setCode) {
-        DatabaseOperations dbOps = new DatabaseOperations();
-        quantity = 0;
-        try{
-            quantity = dbOps.getSetQuantity(connection, this, setCode);
-        } catch(SQLException es) {
-            es.printStackTrace();
-        }
-        return quantity;
-    }
     public String getScale(){
         String scale = "";
         switch (gauge){
@@ -57,8 +34,6 @@ public class Product {
     public void setGauge(String g) { gauge = g; }
     public void setRetailPrice(double rPrice) { retailPrice = rPrice; }
     public void setStockLevel(int sLevel) {stockLevel = sLevel; }
-    public void setSetsCode(String sCode) {setCode.add(sCode); }
-    public void setQuantity(int qt) {quantity = qt; }
 
     public Product(String pCode, String bName, String pName, double rPrice, String gauge, int sLevel){
         this.productCode = pCode;

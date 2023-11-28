@@ -8,9 +8,6 @@ public class Order {
     private Integer userID;
     private OrderStatus status;
     private List<OrderLine> orderLines;
-    private Integer quantity;
-    private float price;
-
     private LocalDate dateMade;
 
     // Constructor
@@ -24,10 +21,6 @@ public class Order {
     
     public Integer getOrderNumber() {
         return orderNumber;
-    }
-   
-    public Integer getUserID() {
-        return userID;
     }
     
     public OrderStatus getStatus() {
@@ -53,10 +46,6 @@ public class Order {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    
-    public void saveDate() {
-        dateMade = LocalDate.now();
     }
     
     public double totalCost(Connection connection) {
