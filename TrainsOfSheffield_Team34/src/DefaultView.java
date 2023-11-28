@@ -420,7 +420,7 @@ public class DefaultView extends JFrame {
                 for (int i = 0; i < o.getOrderLines().size(); i++)
                     newOrderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
 
-                JOptionPane.showMessageDialog(null, newOrderPanel, "Select Quantity",
+                JOptionPane.showMessageDialog(null, newOrderPanel, "My Order",
                         1);
             }
         });

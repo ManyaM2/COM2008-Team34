@@ -28,6 +28,7 @@ public class SignupView extends JFrame {
     public SignupView(Connection connection) throws HeadlessException {
 
         frame = this;
+        getContentPane().setBackground(new Color(232, 244, 248));
 
         this.setTitle("Trains of Sheffield | Sign Up");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

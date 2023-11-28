@@ -927,7 +927,7 @@ public class StaffView extends JFrame {
                 for (int i = 0; i < o.getOrderLines().size(); i++)
                     newOrderPanel.add(getOrderLine(connection, o.getOrderLines().get(i), o, i+1));
 
-                JOptionPane.showMessageDialog(null, newOrderPanel, "Select Quantity", 1);
+                JOptionPane.showMessageDialog(null, newOrderPanel, "Order", 1);
             }
         });
 

@@ -10,42 +10,55 @@ public class WelcomeView extends JFrame {
     private JButton signupButton;
     private JLabel welcomeMessage;
     private JLabel loginMessage;
-    private JLabel signupMessage;
-
 
     public WelcomeView(Connection connection) throws HeadlessException {
-        this.setTitle("Trains of Sheffield | Welcome");
+        this.setTitle("Trains Of Sheffield");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Set the background color of the frame to light blue
+        getContentPane().setBackground(new Color(232, 244, 248));
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
         this.setSize(screenSize.width / 2, screenSize.height / 2);
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
-        //construct components
-        loginButton = new JButton ("Login");
-        signupButton = new JButton ("Sign Up");
-        welcomeMessage = new JLabel ("Welcome to Trains Of Sheffield!");
-        loginMessage = new JLabel ("If you already have an account, please click Login.");
-        signupMessage = new JLabel ("If you do not have an account, please click Sign Up.");
+        // Construct components
+        loginButton = new JButton("Login");
+        signupButton = new JButton("Sign Up");
 
-        //adjust size and set layout
-        setPreferredSize (new Dimension (775, 431));
-        setLayout (null);
+        JLabel helloText = new JLabel("Hello User" );
+        JLabel orText = new JLabel("OR");
+        welcomeMessage = new JLabel(" Welcome To Trains Of Sheffield!");
+        helloText.setForeground(new Color(0, 0, 139));
+        helloText.setFont(new Font("SansSerif", Font.BOLD, 30));
+        welcomeMessage.setForeground(new Color(0, 0, 139));
+        welcomeMessage.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
 
-        //add components
+        loginMessage = new JLabel("If you would like to continue, please click ");
+        loginMessage.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+        orText.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+
+        // Adjust size and set layout
+        setPreferredSize(new Dimension(775, 431));
+        setLayout(null);
+
+        // Add components
         this.add(loginButton);
-        this.add (signupButton);
-        this.add (welcomeMessage);
-        this.add (loginMessage);
-        this.add (signupMessage);
+        this.add(signupButton);
+        this.add(helloText);
+        this.add(orText);
+        this.add(welcomeMessage);
+        this.add(loginMessage);
 
-        //set component bounds (only needed by Absolute Positioning)
-        loginButton.setBounds (340, 150, 80, 30);
-        signupButton.setBounds (340, 235, 80, 30);
-        welcomeMessage.setBounds (290, 5, 230, 45);
-        loginMessage.setBounds (240, 115, 400, 25);
-        signupMessage.setBounds (240, 200, 400, 25);
+        helloText.setBounds(290, 70, 500, 45);
+        welcomeMessage.setBounds(140, 110, 500, 45);
+
+        loginMessage.setBounds(190, 180, 400, 25);
+        loginButton.setBounds(275, 220, 80, 30);
+        orText.setBounds(370, 220, 80, 30);
+
+        signupButton.setBounds(415, 220, 80, 30);
 
         // Create an ActionListener for the login button
         loginButton.addActionListener(new ActionListener() {
@@ -80,7 +93,6 @@ public class WelcomeView extends JFrame {
                 signupView.setVisible(true);
             }
         });
-
         setVisible (true);
     }
 }

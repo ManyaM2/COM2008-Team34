@@ -17,6 +17,7 @@ public class ManagerView extends JFrame {
 
     public ManagerView(Connection connection) throws SQLException {
         DbUpdateOperations dbUpdates = new DbUpdateOperations();
+        getContentPane().setBackground(new Color(232, 244, 248));
         this.setTitle("Trains of Sheffield (Manager) | Staff List");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

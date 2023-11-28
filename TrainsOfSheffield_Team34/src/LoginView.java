@@ -17,6 +17,7 @@ public class LoginView extends JFrame {
     private JButton backButton;
 
     public LoginView(Connection connection) throws HeadlessException {
+        getContentPane().setBackground(new Color(232, 244, 248));
         this.setTitle("Trains of Sheffield | Login");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
