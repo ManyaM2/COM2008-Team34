@@ -127,6 +127,17 @@ public class SignupView extends JFrame {
                         CurrentUserManager.setCurrentUser(user);
 
                         JOptionPane.showMessageDialog(frame, "Sign Up Successful");
+
+                        // Close the signup window and take the user to the login page
+                        dispose();
+
+                        LoginView loginView = null;
+                        try {
+                            loginView = new LoginView(connection);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        loginView.setVisible(true);
                     }
                 }
 
