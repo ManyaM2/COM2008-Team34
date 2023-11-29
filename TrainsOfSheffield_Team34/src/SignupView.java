@@ -114,30 +114,35 @@ public class SignupView extends JFrame {
                         roles.add("customer");
                         User user = new User(forename, surname, email, roles);
 
-                        addAddress(connection);
-                        // Update user details in the database
-                        DbUpdateOperations dbups = new DbUpdateOperations();
-                        try {
-                            dbups.addUser(connection, user, password, userAddress);
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
+                        if (addAddress(connection)){
+                            // Update user details in the database
+                            DbUpdateOperations dbups = new DbUpdateOperations();
+                            try {
+                                dbups.addUser(connection, user, password, userAddress);
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            }
+
+                            // Update user details in the session
+                            CurrentUserManager.setCurrentUser(user);
+
+                            JOptionPane.showMessageDialog(frame, "Sign Up Successful");
+
+                            // Close the signup window and take the user to the login page
+                            dispose();
+
+                            LoginView loginView = null;
+                            try {
+                                loginView = new LoginView(connection);
+                            } catch (Exception ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            loginView.setVisible(true);
+
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Sign up unsuccessful",
+                                    "Invalid Entry", 0);
                         }
-
-                        // Update user details in the session
-                        CurrentUserManager.setCurrentUser(user);
-
-                        JOptionPane.showMessageDialog(frame, "Sign Up Successful");
-
-                        // Close the signup window and take the user to the login page
-                        dispose();
-
-                        LoginView loginView = null;
-                        try {
-                            loginView = new LoginView(connection);
-                        } catch (Exception ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        loginView.setVisible(true);
                     }
                 }
 
@@ -176,7 +181,7 @@ public class SignupView extends JFrame {
         this.setVisible(true);
     }
 
-    private void addAddress(Connection connection) {
+    private boolean addAddress(Connection connection) {
         DbUpdateOperations dbups = new DbUpdateOperations();
 
         //Add fields and labels to the form
@@ -203,10 +208,12 @@ public class SignupView extends JFrame {
                     roadNameField.getText().isBlank() || cityNameField.getText().isBlank()){
                 JOptionPane.showMessageDialog(panel,"Please fill in all the fields ",
                         "Invalid Entry", 0);
+                return false;
             } else {
                 Address newAddress = new Address(houseNumberField.getText(), roadNameField.getText(),
                         cityNameField.getText(), postcodeField.getText());
                 userAddress = newAddress;
+
                 // Update address in database
                 try {
                     dbups.addAddress(connection, newAddress);
@@ -214,7 +221,9 @@ public class SignupView extends JFrame {
                     e.printStackTrace();
                 }
                 JOptionPane.showMessageDialog(panel, "Address updated");
+                return true;
             }
         }
+        return false;
     }
 }
