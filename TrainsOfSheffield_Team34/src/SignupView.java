@@ -128,7 +128,7 @@ public class SignupView extends JFrame {
 
                             JOptionPane.showMessageDialog(frame, "Sign Up Successful");
 
-                            // Close the signup window and take the user to the login page
+                            // Close the signup window and redirect the user to the login page straight away
                             dispose();
 
                             LoginView loginView = null;
